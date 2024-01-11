@@ -1,3 +1,4 @@
+import Employee from "../back-end/entity/Employee";
 function getEmployeeData(employee) {
   return {
     employeeID: employee.getEmployeeID(),
@@ -13,6 +14,21 @@ function getEmployeeData(employee) {
   };
 }
 
-const helperFunctions = { getEmployeeData };
+function instantiateEmployee(req) {
+  const body = req.body;
+  return new Employee(
+    body.employeeID,
+    body.password,
+    body.firstName,
+    body.lastName,
+    body.email,
+    body.active,
+    body.positionID,
+    body.siteID,
+    body.locked,
+    body.notes
+  );
+}
+const helperFunctions = { getEmployeeData, instantiateEmployee };
 
 export default helperFunctions;

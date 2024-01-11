@@ -61,17 +61,18 @@ export async function getEmployeeByID(id) {
       [id]
     );
     const employee = new Employee(
-      row[0].employeeID,
-      row[0].Password,
-      row[0].FirstName,
-      row[0].LastName,
-      row[0].Email,
-      row[0].active,
-      row[0].PositionID,
-      row[0].siteID,
-      row[0].locked,
-      row[0].notes
+      row[0]?.employeeID,
+      row[0]?.Password,
+      row[0]?.FirstName,
+      row[0]?.LastName,
+      row[0]?.Email,
+      row[0]?.active,
+      row[0]?.PositionID,
+      row[0]?.siteID,
+      row[0]?.locked,
+      row[0]?.notes
     );
+
     return employee;
   } catch (e) {
     console.error(e);
@@ -87,9 +88,12 @@ export async function getEmployeeByID(id) {
  */
 export async function employeeExist(employee) {
   try {
+    console.log(employee);
     const id = employee.getEmployeeID();
+    console.log(id);
     const databaseEmployee = await getEmployeeByID(id);
-    return databaseEmployee !== undefined;
+    console.log(databaseEmployee.getEmployeeID());
+    return databaseEmployee.getEmployeeID() !== undefined;
   } catch (e) {
     console.error(e);
   }
