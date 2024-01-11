@@ -1,0 +1,41 @@
+.help {
+  background-image: linear-gradient(
+      to right bottom,
+      rgba(161, 154, 154, 0.35),
+      rgba(161, 154, 154, 0.35)
+    ),
+    url(/public/img/help.jpg);
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  flex-direction: column;
+}
+.helpBox {
+  display: grid;
+  row-gap: 2.4rem;
+  justify-items: center;
+  background-color: var(--color-trim--3);
+  width: 30%;
+
+  margin: auto;
+  padding: 2rem 0;
+  border-radius: 15px;
+  box-shadow: 10px 1px 14px 5px rgba(0, 0, 0, 0.26);
+}
+
+label {
+  margin-right: 0.4rem;
+}
+
+.btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.navLink {
+  text-decoration: none;
+  color: inherit;
+}

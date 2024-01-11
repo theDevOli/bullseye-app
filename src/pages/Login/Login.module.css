@@ -1,0 +1,34 @@
+.login {
+  background-image: linear-gradient(
+      to right bottom,
+      rgba(244, 244, 244, 0.35),
+      rgba(244, 244, 244, 0.35)
+    ),
+    url(/public/img/cover.jpg);
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  flex-direction: column;
+}
+.loginBox {
+  display: grid;
+  row-gap: 2.4rem;
+  justify-items: center;
+  background-color: var(--color-trim--3);
+  width: 30%;
+
+  margin: auto;
+  padding: 2rem 0;
+  border-radius: 15px;
+  box-shadow: 10px 1px 14px 5px rgba(0, 0, 0, 0.26);
+}
+
+.input {
+  display: flex;
+}
+
+.input label {
+  margin-right: 0.4rem;
+}

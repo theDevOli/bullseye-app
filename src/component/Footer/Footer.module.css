@@ -1,0 +1,10 @@
+.copyright {
+  padding: 0.8rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.copyright h2 {
+  font-size: 0.8rem;
+  color: var(--color-dark--1);
+}
