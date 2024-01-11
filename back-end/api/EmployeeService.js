@@ -2,7 +2,6 @@ import express from "express";
 
 import errorMsg from "../../Utils/errorMsg.js";
 import ea from "../DAO/EmployeeAccessor.js";
-import Employee from "../entity/Employee.js";
 import helperFunctions from "../../Utils/helperFunctions.js";
 
 const app = express();
