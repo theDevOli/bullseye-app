@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 
 import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin/Admin";
@@ -9,6 +9,8 @@ import WarehouseManager from "./pages/Warehouse/WarehouseManager";
 import StoreManager from "./pages/Store/StoreManager";
 import StoreWorker from "./pages/Store/StoreWorker";
 import Help from "./pages/Help/Help";
+
+import helperFunctions from "../Utils/helperFunctions";
 
 const initialState = {
   user: "",
@@ -32,6 +34,17 @@ function reducer(state, action) {}
 function App() {
   const [{ user, password, position, isActive, attempt }, dispatch] =
     useReducer(reducer, initialState);
+
+  useEffect(function () {
+    async function getUsers() {
+      const users = await helperFunctions.ajaxRequest(
+        "127.0.0.1:8080/employees",
+        "GET"
+      );
+      console.log(users);
+    }
+    getUsers();
+  }, []);
   return (
     <>
       <BrowserRouter>
