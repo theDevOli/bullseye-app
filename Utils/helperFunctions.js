@@ -61,6 +61,6 @@ export async function ajaxRequest(url, method, data = null) {
   const result = await response.text();
   return result;
 }
-const helperFunctions = { getEmployeeData, instantiateEmployee };
+const helperFunctions = { getEmployeeData, instantiateEmployee, ajaxRequest };
 
 export default helperFunctions;

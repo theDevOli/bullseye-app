@@ -1,10 +1,13 @@
 import express from "express";
+import cors from "cors";
 
 import errorMsg from "../../Utils/errorMsg.js";
 import ea from "../DAO/EmployeeAccessor.js";
 import helperFunctions from "../../Utils/helperFunctions.js";
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
