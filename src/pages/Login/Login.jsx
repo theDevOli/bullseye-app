@@ -12,8 +12,8 @@ const initialState = {
   users: [],
   password: "",
   position: 0,
-  isActive: null,
-  attempts: 3,
+  isLocked: false,
+  attempt: 3,
   isLogin: false,
   showError: false,
 };
@@ -24,16 +24,28 @@ const initialState = {
  * @param {*} action - The dispatched action to update the state.
  */
 function reducer(state, action) {
+  if (state.isLocked) return state;
   switch (action.type) {
+    case "getUsers":
+      return { ...state, users: action.payload };
     case "typeUser":
       return { ...state, user: action.payload };
     case "typePassword":
       return { ...state, password: action.payload };
     case "login":
-      // console.log(users);
-      // const match = users.filter((u) => console.log(u.user, state.user));
-      // console.log(match);
-      return state;
+      console.log(state.users);
+      const [currentUser] = state.users.filter(
+        (u) => u.username === state.user
+      );
+      const isMatch =
+        currentUser?.username === state.user &&
+        currentUser?.password === state.password;
+      return {
+        ...state,
+        attempt: state.attempt - 1,
+        isLogin: isMatch,
+        isLocked: state.attempt <= 1 ? true : false,
+      };
     default:
       throw new Error("Invalid action type");
   }
@@ -58,12 +70,11 @@ function Login() {
           locked: user.locked,
         };
       });
-      console.log(users);
+      dispatch({ type: "getUsers", payload: users });
     }
     getUsers();
   }, []);
-  const [{ user, password, position, isActive, attempt }, dispatch] =
-    useReducer(reducer, initialState);
+  const [{ isLocked }, dispatch] = useReducer(reducer, initialState);
   return (
     <div className={styles.login}>
       <Header type="loginHeader">Login</Header>
@@ -76,6 +87,7 @@ function Login() {
           <input
             type="text"
             id="userName"
+            disabled={isLocked}
             onChange={(e) =>
               dispatch({ type: "typeUser", payload: e.target.value })
             }
@@ -87,6 +99,7 @@ function Login() {
           <input
             type="password"
             id="password"
+            disabled={isLocked}
             onChange={(e) =>
               dispatch({ type: "typePassword", payload: e.target.value })
             }
@@ -94,7 +107,11 @@ function Login() {
         </div>
         {/* <a>Forgot password?</a> */}
         <NavLink to="help">Forgot your password</NavLink>
-        <Button type="primary" onClick={() => dispatch({ type: "login" })}>
+        <Button
+          disabled={isLocked}
+          type="primary"
+          onClick={() => dispatch({ type: "login" })}
+        >
           Login
         </Button>
       </div>
