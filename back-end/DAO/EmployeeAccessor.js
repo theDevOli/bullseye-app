@@ -25,7 +25,7 @@ export async function getAllEmployees() {
     rows.forEach((row) => {
       const employee = new Employee(
         row.employeeID,
-        row.Password,
+        row.username,
         row.FirstName,
         row.LastName,
         row.Email,
@@ -33,12 +33,11 @@ export async function getAllEmployees() {
         row.PositionID,
         row.siteID,
         row.locked,
+        row.Password,
         row.notes
       );
-      console.log(row);
       results.push(employee);
     });
-    // console.log(re)
     return results;
   } catch (e) {
     console.error(e);
@@ -60,9 +59,10 @@ export async function getEmployeeByID(id) {
       `SELECT * FROM employee WHERE employeeID=?`,
       [id]
     );
+    if (row.length === 0) return null;
     const employee = new Employee(
       row[0]?.employeeID,
-      row[0]?.Password,
+      row[0]?.username,
       row[0]?.FirstName,
       row[0]?.LastName,
       row[0]?.Email,
@@ -70,6 +70,7 @@ export async function getEmployeeByID(id) {
       row[0]?.PositionID,
       row[0]?.siteID,
       row[0]?.locked,
+      row[0]?.Password,
       row[0]?.notes
     );
 
@@ -88,12 +89,10 @@ export async function getEmployeeByID(id) {
  */
 export async function employeeExist(employee) {
   try {
-    console.log(employee);
     const id = employee.getEmployeeID();
-    console.log(id);
     const databaseEmployee = await getEmployeeByID(id);
-    console.log(databaseEmployee.getEmployeeID());
-    return databaseEmployee.getEmployeeID() !== undefined;
+
+    return databaseEmployee !== null;
   } catch (e) {
     console.error(e);
   }
@@ -105,11 +104,13 @@ export async function employeeExist(employee) {
  * @returns {Promise<boolean>} True if the employee is added successfully, false otherwise.
  */
 export async function addEmployee(employee) {
+  const ok = await employeeExist(employee);
+  if (ok) return false;
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
   const {
     employeeID,
-    empPassword,
+    username,
     firstName,
     lastName,
     email,
@@ -117,28 +118,31 @@ export async function addEmployee(employee) {
     positionID,
     siteID,
     locked,
+    empPassword,
     notes,
   } = helperFunctions.getEmployeeData(employee);
+
   try {
     const [result] = await pool.query(
-      `INSERT INTO employee (employeeID, password, firstName, lastName, email, active, locked, siteID, positionID, notes) VALUES(?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO employee (employeeID, username, FirstName, LastName, Email, active, PositionID, siteID, locked, Password) VALUES(?,?,?,?,?,?,?,?,?,?)`,
       [
         employeeID,
-        empPassword,
+        username,
         firstName,
         lastName,
         email,
         active,
-        locked,
-        siteID,
         positionID,
-        notes,
+        siteID,
+        locked,
+        empPassword,
       ]
     );
-    console.log(result);
+
     return result.insertId !== undefined;
   } catch (e) {
     console.error(e);
+    return false;
   } finally {
     conn.closePool();
   }
@@ -150,6 +154,8 @@ export async function addEmployee(employee) {
  * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
  */
 async function activeInactiveEmployee(employee) {
+  const ok = await employeeExist(employee);
+  if (!ok) return false;
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
 
@@ -166,6 +172,8 @@ async function activeInactiveEmployee(employee) {
     );
     return result.affectedRows === 1;
   } catch (e) {
+    console.error(e);
+    return false;
   } finally {
     conn.closePool();
   }
@@ -177,25 +185,28 @@ async function activeInactiveEmployee(employee) {
  * @returns {Promise<boolean>} True if the employee is updated successfully, false otherwise.
  */
 async function updateEmployee(employee) {
+  const ok = await employeeExist(employee);
+  if (!ok) return false;
+
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
 
   if (
-    !employee.getPassword() &&
+    !employee.getUsername() &&
     !employee.getFirstName() &&
     !employee.getLastName() &&
     !employee.getEmail() &&
     !employee.getSiteID() &&
     !employee.getPositionID() &&
-    !employee.getNotes()
+    !employee.getPassword()
   )
     return;
   const employeeID = employee.getEmployeeID();
   const databaseEmployee = await getEmployeeByID(employeeID);
 
-  const empPassword = employee.getPassword()
-    ? employee.getPassword()
-    : databaseEmployee.getPassword();
+  const username = employee.getUsername()
+    ? employee.getUsername()
+    : databaseEmployee.getUsername();
   const firstName = employee.getFirstName()
     ? employee.getFirstName()
     : databaseEmployee.getFirstName();
@@ -211,33 +222,41 @@ async function updateEmployee(employee) {
   const positionID = employee.getPositionID()
     ? employee.getPositionID()
     : databaseEmployee.getPositionID();
+  const empPassword = employee.getPassword()
+    ? employee.getPassword()
+    : databaseEmployee.getPassword();
   const notes = employee.getNotes()
     ? employee.getNotes()
     : databaseEmployee.getNotes();
 
   try {
+    // employeeID, Password, username, FirstName, LastName, Email, active, PositionID, siteID, locked
     const [result] = await pool.query(
-      `UPDATE employee SET
-      password = ?,
-      firstName = ?,
-      lastName = ?,
-      email = ?,
-      siteID = ?,
-      positionID = ?,
-      notes = ? WHERE employeeID =?`,
+      `UPDATE employee SET username = ?, 
+      FirstName = ?, 
+      LastName = ?, 
+      Email = ?, 
+      siteID = ?, 
+      PositionID = ?, 
+      Password = ?,
+      notes = ? 
+      WHERE employeeID =?`,
       [
-        empPassword,
+        username,
         firstName,
         lastName,
         email,
         siteID,
         positionID,
+        empPassword,
         notes,
         employeeID,
       ]
     );
     return result.affectedRows === 1;
   } catch (e) {
+    console.error(e);
+    return false;
   } finally {
     conn.closePool();
   }
@@ -249,6 +268,9 @@ async function updateEmployee(employee) {
  * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
  */
 async function lockEmployee(employee) {
+  const ok = await employeeExist(employee);
+  if (!ok) return false;
+
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
 

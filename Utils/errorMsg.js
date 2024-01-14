@@ -16,10 +16,11 @@ const SERVER_ERROR =
  *Conflict error message
  *@type {string}
  *@constant
- *@description Message: "Conflict: There are the same data on our system, please provide different data."
+ *@description Message: "Conflict: The resource you are trying to create/update already exists or does not exist. Please provide unique data or check the existing resource.
+"
  */
 const CONFLICT_ADD_ERROR =
-  "Conflict: There are the same data on our system, please provide different data.";
+  "Conflict: The resource you are trying to create already exists. Please check your data or use a different set of information.";
 
 /**
  *Bad request error message

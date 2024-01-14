@@ -1,10 +1,14 @@
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../../.env" });
+
+const defaultPassword = process.env.EMPLOYEE_DEFAULT_PASSWORD;
 /**
  * @module Employee
  */
 export default class Employee {
   #employeeID;
-  // #username;
-  #password;
+  #username;
   #firstName;
   #lastName;
   #email;
@@ -12,12 +16,13 @@ export default class Employee {
   #positionID;
   #siteID;
   #locked;
+  #password;
   #notes;
 
   /**
    * Creates an instance of the Employee class.
    * @param {number} employeeID - The unique identifier for the employee.
-   * @param {string} password - The password associated with the employee.
+   * @param {string} username - The username associated with the employee.
    * @param {string} firstName - The first name of the employee.
    * @param {string} lastName - The last name of the employee.
    * @param {string} email - The email address of the employee.
@@ -25,12 +30,12 @@ export default class Employee {
    * @param {number} positionID - The unique identifier for the employee's position.
    * @param {number} siteID - The unique identifier for the employee's site.
    * @param {number} locked - Indicates whether the employee is locked(3 attempts to login).
+   * @param {string} password - The password associated with the employee.
    * @param {string} notes - Additional notes or comments about the employee.
    */
   constructor(
     employeeID,
-    // username,
-    password,
+    username,
     firstName,
     lastName,
     email,
@@ -38,11 +43,11 @@ export default class Employee {
     positionID,
     siteID,
     locked,
+    password = defaultPassword,
     notes = null
   ) {
     this.#employeeID = employeeID;
-    // this.#username = username;
-    this.#password = password;
+    this.#username = username;
     this.#firstName = firstName;
     this.#lastName = lastName;
     this.#email = email;
@@ -50,6 +55,7 @@ export default class Employee {
     this.#positionID = positionID;
     this.#siteID = siteID;
     this.#locked = locked;
+    this.#password = password;
     this.#notes = notes;
   }
 
@@ -61,16 +67,12 @@ export default class Employee {
     return this.#employeeID;
   }
 
-  // getUsername() {
-  //   return this.#username;
-  // }
-
   /**
-   * Gets the employee's password.
-   * @returns {string} The employee's password.
+   * Gets the employee's username.
+   * @returns {string} The employee's username.
    */
-  getPassword() {
-    return this.#password;
+  getUsername() {
+    return this.#username;
   }
 
   /**
@@ -130,6 +132,14 @@ export default class Employee {
   }
 
   /**
+   * Gets the employee's password.
+   * @returns {string} The employee's password.
+   */
+  getPassword() {
+    return this.#password;
+  }
+
+  /**
    * Gets additional notes about the employee.
    * @returns {string} Notes about the employee.
    */
@@ -144,8 +154,7 @@ export default class Employee {
   toJSON() {
     return {
       employeeID: this.#employeeID,
-      // username: this.#username,
-      password: this.#password,
+      username: this.#username,
       firstName: this.#firstName,
       lastName: this.#lastName,
       email: this.#email,
@@ -153,6 +162,7 @@ export default class Employee {
       positionID: this.#positionID,
       siteID: this.#siteID,
       locked: this.#locked,
+      password: this.#password,
       notes: this.#notes,
     };
   }

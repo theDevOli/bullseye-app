@@ -8,7 +8,7 @@ import Employee from "../back-end/entity/Employee.js";
 function getEmployeeData(employee) {
   return {
     employeeID: employee.getEmployeeID(),
-    empPassword: employee.getPassword(),
+    username: employee.getUsername(),
     firstName: employee.getFirstName(),
     lastName: employee.getLastName(),
     email: employee.getEmail(),
@@ -16,6 +16,7 @@ function getEmployeeData(employee) {
     positionID: employee.getPositionID(),
     siteID: employee.getSiteID(),
     locked: employee.getLocked(),
+    empPassword: employee.getPassword(),
     notes: employee.getNotes(),
   };
 }
@@ -29,14 +30,15 @@ function instantiateEmployee(req) {
   const body = req.body;
   return new Employee(
     body.employeeID,
-    body.password,
-    body.firstName,
-    body.lastName,
-    body.email,
+    body.username,
+    body.FirstName,
+    body.LastName,
+    body.Email,
     body.active,
-    body.positionID,
+    body.PositionID,
     body.siteID,
     body.locked,
+    body.password,
     body.notes
   );
 }
@@ -61,6 +63,32 @@ export async function ajaxRequest(url, method, data = null) {
   const result = await response.text();
   return result;
 }
-const helperFunctions = { getEmployeeData, instantiateEmployee, ajaxRequest };
+
+/**
+ * Creates an Employee object with invalid data, except for the id.
+ *
+ * @param {Object} req - The request object containing parameters.
+ * @returns {Employee} - A dummy Employee object.
+ */
+function dummyEmployee(req) {
+  const id = Number(req.params.employeeID);
+  return new Employee(
+    id,
+    "username",
+    "firstName",
+    "lastName",
+    "email",
+    1,
+    1,
+    1
+  );
+}
+
+const helperFunctions = {
+  getEmployeeData,
+  instantiateEmployee,
+  dummyEmployee,
+  ajaxRequest,
+};
 
 export default helperFunctions;
