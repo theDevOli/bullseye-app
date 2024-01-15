@@ -1,17 +1,20 @@
 import PropTypes from "prop-types";
 import { createContext, useContext, useEffect, useReducer } from "react";
 
+import errorMsg from "../../Utils/errorMsg";
+
 const AuthContext = createContext();
 
 const initialState = {
   user: null,
   users: [],
+  currentUser: {},
   password: "",
-  position: 0,
+  position: null,
   isLocked: false,
   attempt: 3,
   isLogin: false,
-  showError: false,
+  error: false,
 };
 
 /**
@@ -41,7 +44,12 @@ function reducer(state, action) {
         attempt: state.attempt - 1,
         isLogin: isMatch,
         isLocked: state.attempt <= 1 ? true : false,
+        error: errorMsg.LOGIN_ERROR,
+        position: isMatch ? currentUser?.positionID : null,
+        currentUser: currentUser,
       };
+    case "error":
+      return { ...state, error: action.payload };
     case "logout":
       return { ...state, initialState };
     default:
@@ -49,33 +57,94 @@ function reducer(state, action) {
   }
 }
 function AuthProvider({ children }) {
-  const [{ user, users, isLocked }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [
+    {
+      user,
+      password,
+      currentUser,
+      position,
+      isLocked,
+      attempt,
+      isLogin,
+      error,
+    },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
-  function login(username, password) {}
+  function userHandler(e) {
+    dispatch({ type: "typeUser", payload: e.target.value });
+  }
+
+  function passwordHandler(e) {
+    dispatch({ type: "typePassword", payload: e.target.value });
+  }
+
+  async function login() {
+    console.log(user, currentUser?.username);
+    dispatch({ type: "login" });
+    if (user !== currentUser?.username || currentUser?.locked) return;
+    if (isLocked) {
+      dispatch({ type: "error", payload: errorMsg.LOCKED_ERROR });
+      console.log(currentUser);
+      const res = await fetch(
+        `http://localhost:8080/EmployeeService/employees/inactive/${currentUser?.employeeID}`,
+        { method: "PUT" }
+      );
+      let data = await res.json();
+      data = data.data;
+      console.log(data);
+    }
+  }
 
   function logout() {
     dispatch({ type: "logout" });
   }
+  useEffect(function () {
+    async function getUsers() {
+      const res = await fetch(
+        "http://localhost:8080/EmployeeService/employees"
+      );
+      let data = await res.json();
+      data = data.data;
+      console.log(data);
+      const users = data.map((user) => {
+        return {
+          username: user.username,
+          password: user.password,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          active: user.active,
+          locked: user.locked,
+          position: user.positionID,
+          employeeID: user.employeeID,
+        };
+      });
+      dispatch({ type: "getUsers", payload: users });
+    }
+    getUsers();
+  }, []);
 
-  async function getUsers() {
-    const res = await fetch("http://localhost:8080/employees");
-    let data = await res.json();
-    data = data.data;
-    const users = data.map((user) => {
-      return {
-        username: user.email.split("@")[0],
-        password: user.password,
-        active: user.active,
-        locked: user.locked,
-      };
-    });
-    dispatch({ type: "getUsers", payload: users });
-  }
-
-  return <AuthContext.Provider>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        password,
+        position,
+        isLocked,
+        attempt,
+        isLogin,
+        error,
+        currentUser,
+        userHandler,
+        passwordHandler,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 function useAuth() {

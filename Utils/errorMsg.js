@@ -52,10 +52,28 @@ const BULK_ERROR =
  *Unsupported single operation error message
  *@type {string}
  *@constant
- *@description Message: "Internal Server Error.  Please contact the network administrator"
+ *@description Message: "Internal Server Error.  Please contact the network administrator."
  */
 const SINGLE_ERROR =
-  "Not supported operation: single operations are not supported";
+  "Not supported operation: Single operations are not supported.";
+
+/**
+ *Login error message
+ *@type {string}
+ *@constant
+ *@description Message: "Invalid Credentials: Invalid username and/or password. Please contact your Administrator admin@bullseye.ca for assistance."
+ */
+const LOGIN_ERROR =
+  "Invalid Credentials: Invalid username and/or password. Please contact your Administrator admin@bullseye.ca for assistance.";
+
+/**
+ *Locked login error message
+ *@type {string}
+ *@constant
+ *@description Message: "Invalid Credentials: invalid username and/or password. Please contact your Administrator admin@bullseye.ca for assistance."
+ */
+const LOCKED_ERROR =
+  "Locked Account: Your account has been locked because of too many incorrect login attempts. Please contact your Administrator at admin@bullseye.ca for assistance.";
 
 /**
  * Object that encapsulates all error messages provided by the module.
@@ -69,6 +87,8 @@ const errorMsg = {
   NOT_FOUND_ERROR,
   BULK_ERROR,
   SINGLE_ERROR,
+  LOGIN_ERROR,
+  LOCKED_ERROR,
 };
 
 export default errorMsg;
