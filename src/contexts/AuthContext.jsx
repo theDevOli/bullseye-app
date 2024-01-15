@@ -6,15 +6,13 @@ import errorMsg from "../../Utils/errorMsg";
 const AuthContext = createContext();
 
 const initialState = {
-  user: null,
   users: [],
-  currentUser: {},
-  password: "",
+  currentUser: null,
   position: null,
   isLocked: false,
   attempt: 3,
   isLogin: false,
-  error: false,
+  error: null,
 };
 
 /**
@@ -27,26 +25,21 @@ function reducer(state, action) {
   switch (action.type) {
     case "getUsers":
       return { ...state, users: action.payload };
-    case "typeUser":
-      return { ...state, user: action.payload };
-    case "typePassword":
-      return { ...state, password: action.payload };
-    case "login":
-      console.log(state.users);
-      const [currentUser] = state.users.filter(
-        (u) => u.username === state.user
+    case "getCurrentUser":
+      console.log("getCurrentUser");
+      const [current] = state.users.filter(
+        (u) => u.username === action.payload
       );
-      const isMatch =
-        currentUser?.username === state.user &&
-        currentUser?.password === state.password;
+      return { ...state, currentUser: current };
+    case "invalidCredentials":
+      return { ...state, attempt: state.attempt - 1 };
+    case "locked":
+      return { ...state, isLocked: true, error: action.payload };
+    case "login":
       return {
         ...state,
-        attempt: state.attempt - 1,
-        isLogin: isMatch,
-        isLocked: state.attempt <= 1 ? true : false,
-        error: errorMsg.LOGIN_ERROR,
-        position: isMatch ? currentUser?.positionID : null,
-        currentUser: currentUser,
+        isLogin: true,
+        position: state.currentUser?.position,
       };
     case "error":
       return { ...state, error: action.payload };
@@ -59,8 +52,8 @@ function reducer(state, action) {
 function AuthProvider({ children }) {
   const [
     {
-      user,
-      password,
+      // user,
+      // password,
       currentUser,
       position,
       isLocked,
@@ -71,21 +64,33 @@ function AuthProvider({ children }) {
     dispatch,
   ] = useReducer(reducer, initialState);
 
-  function userHandler(e) {
-    dispatch({ type: "typeUser", payload: e.target.value });
-  }
+  // function userHandler(e) {
+  //   dispatch({ type: "typeUser", payload: e.target.value });
+  // }
 
-  function passwordHandler(e) {
-    dispatch({ type: "typePassword", payload: e.target.value });
-  }
+  // function passwordHandler(e) {
+  //   dispatch({ type: "typePassword", payload: e.target.value });
+  // }
 
-  async function login() {
-    console.log(user, currentUser?.username);
-    dispatch({ type: "login" });
-    if (user !== currentUser?.username || currentUser?.locked) return;
-    if (isLocked) {
-      dispatch({ type: "error", payload: errorMsg.LOCKED_ERROR });
-      console.log(currentUser);
+  async function login(user, password) {
+    // console.log(user, currentUser?.username);
+    // dispatch({ type: "login" });
+    // if (user !== currentUser?.username || currentUser?.locked) return;
+    // if (isLocked) {
+    //   dispatch({ type: "error", payload: errorMsg.LOCKED_ERROR });
+    //   console.log(currentUser);
+    //   const res = await fetch(
+    //     `http://localhost:8080/EmployeeService/employees/inactive/${currentUser?.employeeID}`,
+    //     { method: "PUT" }
+    //   );
+    //   let data = await res.json();
+    //   data = data.data;
+    //   console.log(data);
+    console.log("before");
+    dispatch({ type: "getCurrentUser", payload: user });
+    console.log("after");
+
+    if (!isLocked && attempt === 0) {
       const res = await fetch(
         `http://localhost:8080/EmployeeService/employees/inactive/${currentUser?.employeeID}`,
         { method: "PUT" }
@@ -94,11 +99,34 @@ function AuthProvider({ children }) {
       data = data.data;
       console.log(data);
     }
+
+    if (attempt === 0) {
+      dispatch({ type: "locked", payload: errorMsg.LOCKED_ERROR });
+      return;
+    }
+
+    // if (!currentUser) {
+    //   dispatch({ type: "error", payload: errorMsg.LOGIN_ERROR });
+    //   return;
+    // }
+
+    if (currentUser?.username !== user && currentUser?.password !== password) {
+      dispatch({ type: "invalidCredentials" });
+      return;
+    }
+
+    if (currentUser?.username === user && currentUser?.password === password) {
+      dispatch({ type: "login" });
+      return;
+    }
+
+    dispatch({ type: "invalidCredentials" });
   }
 
   function logout() {
     dispatch({ type: "logout" });
   }
+
   useEffect(function () {
     async function getUsers() {
       const res = await fetch(
@@ -128,16 +156,16 @@ function AuthProvider({ children }) {
   return (
     <AuthContext.Provider
       value={{
-        user,
-        password,
+        // user,
+        // password,
         position,
         isLocked,
         attempt,
         isLogin,
         error,
         currentUser,
-        userHandler,
-        passwordHandler,
+        // userHandler,
+        // passwordHandler,
         login,
         logout,
       }}

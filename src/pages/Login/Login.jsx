@@ -6,6 +6,7 @@ import Header from "../../component/Header/Header";
 
 import styles from "./Login.module.css";
 import { useAuth } from "../../contexts/AuthContext";
+import { useState } from "react";
 
 /**
  * Login page for user authentication.
@@ -14,18 +15,27 @@ import { useAuth } from "../../contexts/AuthContext";
  */
 function Login() {
   const {
-    user,
-    password,
     position,
     isLocked,
     attempt,
     isLogin,
     error,
-    userHandler,
-    passwordHandler,
+    // userHandler,
+    // passwordHandler,
     login,
     logout,
   } = useAuth();
+  const [user, setUser] = useState("econcepcion");
+  const [password, setPassword] = useState("P@ssw0rd-");
+
+  function userHandler(e) {
+    setUser(e.target.value);
+  }
+
+  function passwordHandler(e) {
+    setPassword(e.target.value);
+  }
+
   return (
     <div className={styles.login}>
       <Header type="loginHeader">Login</Header>
@@ -54,7 +64,11 @@ function Login() {
         </div>
         {/* <a>Forgot password?</a> */}
         <NavLink to="help">Forgot your password</NavLink>
-        <Button disabled={isLocked} type="primary" onClick={login}>
+        <Button
+          disabled={isLocked}
+          type="primary"
+          onClick={() => login(user, password)}
+        >
           Login
         </Button>
       </div>

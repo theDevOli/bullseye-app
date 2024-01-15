@@ -75,6 +75,15 @@ const LOGIN_ERROR =
 const LOCKED_ERROR =
   "Locked Account: Your account has been locked because of too many incorrect login attempts. Please contact your Administrator at admin@bullseye.ca for assistance.";
 
+// /**
+//  *Not found user login error message
+//  *@type {string}
+//  *@constant
+//  *@description Message: "Invalid Credentials: invalid username and/or password. Please contact your Administrator admin@bullseye.ca for assistance."
+//  */
+// const NOT_FOUD_USER_ERROR =
+//   "Locked Account: Your account has been locked because of too many incorrect login attempts. Please contact your Administrator at admin@bullseye.ca for assistance.";
+
 /**
  * Object that encapsulates all error messages provided by the module.
  * @type {object}
