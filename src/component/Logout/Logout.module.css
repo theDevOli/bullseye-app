@@ -1,0 +1,10 @@
+.logout {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  width: 15%;
+  align-items: center;
+  box-shadow: 1px 1px 4px 5px rgba(0, 0, 0, 0.26);
+  padding: 0.8rem 1rem;
+  margin: 0.8rem;
+  border-radius: 15px;
+}

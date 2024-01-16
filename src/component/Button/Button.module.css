@@ -22,6 +22,12 @@
   background: none;
   border: 1px solid currentColor;
 }
+.logout {
+  font-weight: 600;
+  background: none;
+  border: 1px solid currentColor;
+  width: 100%;
+}
 
 .position {
   font-weight: 700;

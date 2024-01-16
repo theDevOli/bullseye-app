@@ -15,6 +15,8 @@ const initialState = {
   error: null,
 };
 
+let current = {};
+
 /**
  * This contains all logic related to the Login
  * @param {*} state - The current state.
@@ -26,10 +28,8 @@ function reducer(state, action) {
     case "getUsers":
       return { ...state, users: action.payload };
     case "getCurrentUser":
-      console.log("getCurrentUser");
-      const [current] = state.users.filter(
-        (u) => u.username === action.payload
-      );
+      [current] = state.users.filter((u) => u.username === action.payload);
+      console.log(current);
       return { ...state, currentUser: current };
     case "invalidCredentials":
       return { ...state, attempt: state.attempt - 1 };
@@ -51,48 +51,21 @@ function reducer(state, action) {
 }
 function AuthProvider({ children }) {
   const [
-    {
-      // user,
-      // password,
-      currentUser,
-      position,
-      isLocked,
-      attempt,
-      isLogin,
-      error,
-    },
+    { currentUser, position, isLocked, attempt, isLogin, error },
     dispatch,
   ] = useReducer(reducer, initialState);
 
-  // function userHandler(e) {
-  //   dispatch({ type: "typeUser", payload: e.target.value });
-  // }
-
-  // function passwordHandler(e) {
-  //   dispatch({ type: "typePassword", payload: e.target.value });
-  // }
-
   async function login(user, password) {
-    // console.log(user, currentUser?.username);
-    // dispatch({ type: "login" });
-    // if (user !== currentUser?.username || currentUser?.locked) return;
-    // if (isLocked) {
-    //   dispatch({ type: "error", payload: errorMsg.LOCKED_ERROR });
-    //   console.log(currentUser);
-    //   const res = await fetch(
-    //     `http://localhost:8080/EmployeeService/employees/inactive/${currentUser?.employeeID}`,
-    //     { method: "PUT" }
-    //   );
-    //   let data = await res.json();
-    //   data = data.data;
-    //   console.log(data);
-    console.log("before");
     dispatch({ type: "getCurrentUser", payload: user });
-    console.log("after");
+
+    if (current.lock) {
+      dispatch({ type: "locked", payload: errorMsg.LOCKED_ERROR });
+      return;
+    }
 
     if (!isLocked && attempt === 0) {
       const res = await fetch(
-        `http://localhost:8080/EmployeeService/employees/inactive/${currentUser?.employeeID}`,
+        `http://localhost:8080/EmployeeService/employees/lock/${currentUser?.employeeID}`,
         { method: "PUT" }
       );
       let data = await res.json();
@@ -156,16 +129,12 @@ function AuthProvider({ children }) {
   return (
     <AuthContext.Provider
       value={{
-        // user,
-        // password,
         position,
         isLocked,
         attempt,
         isLogin,
         error,
         currentUser,
-        // userHandler,
-        // passwordHandler,
         login,
         logout,
       }}

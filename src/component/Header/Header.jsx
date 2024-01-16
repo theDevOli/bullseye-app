@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import styles from "./Header.module.css";
+import Logout from "../Logout/Logout";
+import UserInfo from "../UserInfo/UserInfo";
 
 /**
  * Header component displaying Bullseye's logo and current location.
@@ -10,13 +12,18 @@ import styles from "./Header.module.css";
  * @returns {JSX.Element} - The rendered Header component.
  */
 function Header({ children, type }) {
+  const isLogin = true;
   return (
     <header>
-      <div className={styles.header}>
-        <img src="/public/img/logo-192.png" alt="Bullseye's Logo" />
-        <h2 className={`${styles[type]}`}>
-          Bullseye Inventory Management System - {children}
-        </h2>
+      <div className={`${styles[type]}`}>
+        <img src="/img/logo-192.png" alt="Bullseye's Logo" />
+        <div>
+          <h2 className={`${styles[type]}`}>
+            Bullseye Inventory Management System - {children}
+          </h2>
+          {isLogin && <UserInfo />}
+        </div>
+        {isLogin && <Logout />}
       </div>
     </header>
   );
