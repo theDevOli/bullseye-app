@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import styles from "./Header.module.css";
 import Logout from "../Logout/Logout";
 import UserInfo from "../UserInfo/UserInfo";
+import { useAuth } from "../../contexts/AuthContext";
 
 /**
  * Header component displaying Bullseye's logo and current location.
@@ -12,7 +13,8 @@ import UserInfo from "../UserInfo/UserInfo";
  * @returns {JSX.Element} - The rendered Header component.
  */
 function Header({ children, type }) {
-  const isLogin = true;
+  // const isLogin = true; test purpose
+  const { isLogin } = useAuth();
   return (
     <header>
       <div className={`${styles[type]}`}>

@@ -1,21 +1,26 @@
 import PropTypes from "prop-types";
 import Header from "../Header/Header";
-import Logout from "../Logout/Logout";
-function Dashboard({ children }) {
+import SideBar from "../SideBar/SideBar";
+import DashboardContent from "../DashboardContent/DashboardContent";
+import styles from "./Dashboard.module.css";
+function Dashboard({ name, btns }) {
   return (
-    <div>
-      <Header type="dashboard">Admin</Header>
-      {/* <UserInfo /> */}
-    </div>
+    <>
+      <Header type="dashboard">{name}</Header>
+      <div className={styles.dashboard}>
+        <SideBar>{btns}</SideBar>
+        <DashboardContent />
+      </div>
+    </>
   );
 }
 
 /**
- * Prop types for the Button component to enforce type checking.
+ * Prop types for the Dashboard component to enforce type checking.
  * @static
  */
 Dashboard.propTypes = {
-  //   children: PropTypes.node.isRequired,
-  children: PropTypes.node,
+  name: PropTypes.string.isRequired,
+  btns: PropTypes.array.isRequired,
 };
 export default Dashboard;

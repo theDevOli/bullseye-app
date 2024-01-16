@@ -1,0 +1,11 @@
+.sidebar {
+  display: flex;
+  /* flex-direction: column; */
+  padding: 0.8rem;
+  margin: 1.8rem;
+  box-shadow: 1px 1px 4px 5px rgba(0, 0, 0, 0.26);
+}
+
+.sidebar Button {
+  margin: 0.4rem;
+}

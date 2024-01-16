@@ -1,5 +1,7 @@
+import Dashboard from "../../component/Dashboard/Dashboard";
+
 function Admin() {
-  return <div>ADMIN</div>;
+  return <Dashboard name="Admin" btns={["Employees", "Permissions"]} />;
 }
 
 export default Admin;
