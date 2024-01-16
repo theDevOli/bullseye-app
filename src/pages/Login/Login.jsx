@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import Button from "../../component/Button/Button";
 import Footer from "../../component/Footer/Footer";
 import Header from "../../component/Header/Header";
+import Error from "../../component/Error/Error";
 
 import styles from "./Login.module.css";
 import { useAuth } from "../../contexts/AuthContext";
@@ -40,7 +41,13 @@ function Login() {
     <div className={styles.login}>
       <Header type="loginHeader">Login</Header>
 
-      <div className={styles.loginBox}>
+      <form
+        className={styles.loginBox}
+        onSubmit={(e) => {
+          e.preventDefault();
+          login(user, password);
+        }}
+      >
         <h1>Login</h1>
 
         <div className={styles.input}>
@@ -64,14 +71,11 @@ function Login() {
         </div>
         {/* <a>Forgot password?</a> */}
         <NavLink to="help">Forgot your password</NavLink>
-        <Button
-          disabled={isLocked}
-          type="primary"
-          onClick={() => login(user, password)}
-        >
+        <Button disabled={isLocked} type="primary">
           Login
         </Button>
-      </div>
+      </form>
+      {error && <Error>{error}</Error>}
       <Footer />
     </div>
   );

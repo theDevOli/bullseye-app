@@ -32,7 +32,7 @@ function reducer(state, action) {
       console.log(current);
       return { ...state, currentUser: current };
     case "invalidCredentials":
-      return { ...state, attempt: state.attempt - 1 };
+      return { ...state, attempt: state.attempt - 1, error: action.payload };
     case "locked":
       return { ...state, isLocked: true, error: action.payload };
     case "login":
@@ -83,17 +83,17 @@ function AuthProvider({ children }) {
     //   return;
     // }
 
-    if (currentUser?.username !== user && currentUser?.password !== password) {
-      dispatch({ type: "invalidCredentials" });
-      return;
-    }
+    // if (currentUser?.username !== user && currentUser?.password !== password) {
+    //   dispatch({ type: "invalidCredentials" });
+    //   return;
+    // }
 
     if (currentUser?.username === user && currentUser?.password === password) {
       dispatch({ type: "login" });
       return;
     }
 
-    dispatch({ type: "invalidCredentials" });
+    dispatch({ type: "invalidCredentials", payload: errorMsg.LOGIN_ERROR });
   }
 
   function logout() {

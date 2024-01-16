@@ -75,6 +75,24 @@ const LOGIN_ERROR =
 const LOCKED_ERROR =
   "Locked Account: Your account has been locked because of too many incorrect login attempts. Please contact your Administrator at admin@bullseye.ca for assistance.";
 
+/**
+ *Missing output error message
+ *@type {string}
+ *@constant
+ *@description Message: "All fields are required: Please fill up all inputs."
+ */
+const MISSING_OUTPUT_ERROR =
+  "All fields are required: Please fill up all inputs.";
+
+/**
+ *Not matched error message
+ *@type {string}
+ *@constant
+ *@description Message: "Fields does not match: The new password field must be equal to confirm password field."
+ */
+const NOT_MATCHED_ERROR =
+  "Fields does not match: The new password field must be equal to confirm password field.";
+
 // /**
 //  *Not found user login error message
 //  *@type {string}
@@ -98,6 +116,8 @@ const errorMsg = {
   SINGLE_ERROR,
   LOGIN_ERROR,
   LOCKED_ERROR,
+  MISSING_OUTPUT_ERROR,
+  NOT_MATCHED_ERROR,
 };
 
 export default errorMsg;

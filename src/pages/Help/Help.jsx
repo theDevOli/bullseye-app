@@ -1,10 +1,12 @@
 import Button from "../../component/Button/Button";
 import Header from "../../component/Header/Header";
 import Footer from "../../component/Footer/Footer";
+import Error from "../../component/Error/Error";
 
 import styles from "./Help.module.css";
 import { NavLink } from "react-router-dom";
 import { useReducer, useState } from "react";
+import errorMsg from "../../../Utils/errorMsg";
 
 const initialState = {
   name: "",
@@ -21,6 +23,10 @@ function reducer(state, action) {
       return { ...state, newPassword: action.payload };
     case "confirmPassword":
       return { ...state, confirmPassword: action.payload };
+    case "missingOutput":
+      return { ...state, error: action.payload };
+    case "notMatched":
+      return { ...state, error: action.payload };
     default:
       throw new Error("Unknown action");
   }
@@ -31,16 +37,32 @@ function reducer(state, action) {
  * @returns {JSX.Element} - The rendered Help page.
  */
 function Help() {
-  const [{ name, newPassword, confirmPassword }, dispatch] = useReducer(
+  const [{ name, newPassword, confirmPassword, error }, dispatch] = useReducer(
     reducer,
     initialState
   );
-  function resetPassword() {}
+  function resetPassword() {
+    if (!name || !newPassword || !confirmPassword) {
+      dispatch({
+        type: "missingOutput",
+        payload: errorMsg.MISSING_OUTPUT_ERROR,
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      dispatch({
+        type: "notMatched",
+        payload: errorMsg.NOT_MATCHED_ERROR,
+      });
+      return;
+    }
+  }
   return (
     <div className={styles.help}>
       <Header type="loginHeader">Reset Password</Header>
 
-      <div className={styles.helpBox}>
+      <form className={styles.helpBox}>
         <h1>Reset Password</h1>
 
         <div>
@@ -84,7 +106,10 @@ function Help() {
             </NavLink>
           </Button>
         </div>
-      </div>
+      </form>
+
+      {error && <Error>{error}</Error>}
+
       <Footer />
     </div>
   );

@@ -1,0 +1,16 @@
+.error {
+  display: grid;
+  row-gap: 2.4rem;
+  justify-items: center;
+  background-color: var(--color-trim--3);
+  width: 30%;
+
+  margin: auto;
+  padding: 2rem 0;
+  border-radius: 15px;
+  box-shadow: 10px 1px 14px 5px rgba(0, 0, 0, 0.26);
+}
+
+.errorBox {
+  margin: 0 2rem;
+}
