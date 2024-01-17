@@ -1,8 +1,4 @@
-import dotenv from "dotenv";
-
-dotenv.config({ path: "../../.env" });
-
-const defaultPassword = process.env.EMPLOYEE_DEFAULT_PASSWORD;
+import { EMPLOYEE_DEFAULT_PASSWORD } from "../../Utils/Constants.js";
 /**
  * @module Employee
  */
@@ -43,7 +39,7 @@ export default class Employee {
     positionID,
     siteID,
     locked,
-    password = defaultPassword,
+    password = EMPLOYEE_DEFAULT_PASSWORD,
     notes = null
   ) {
     this.#employeeID = employeeID;

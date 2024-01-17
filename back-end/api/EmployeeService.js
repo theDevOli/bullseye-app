@@ -5,6 +5,9 @@ import errorMsg from "../../Utils/errorMsg.js";
 import ea from "../DAO/EmployeeAccessor.js";
 import helperFunctions from "../../Utils/helperFunctions.js";
 
+import bcrypt from "bcrypt";
+const saltRounds = 10;
+
 const app = express();
 
 app.use(cors());
@@ -65,8 +68,9 @@ app.post("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
  * @response 500 - Internal server error.
  */
 app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
+  const hash = await hashPassword(req.body.password);
   try {
-    const employee = helperFunctions.instantiateEmployee(req);
+    const employee = helperFunctions.instantiateEmployee(req, hash);
 
     try {
       const ok = await ea.updateEmployee(employee);
@@ -85,36 +89,76 @@ app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
 
 //---------------Special Routes---------------------------
 
-/**
- * PUT /EmployeeService/employees/inactive/:employeeID
- * @summary Toggle the active/inactive status of any employee.
- * @response 200 - Successfully updated employee.
- * @response 400 - Bad request, invalid input.
- * @response 404 - Not found, employee with the specified ID does not exist.
- * @response 500 - Internal server error.
- */
-app.put(
-  "/EmployeeService/employees/inactive/:employeeID(\\d+)",
-  async (req, res) => {
-    const dummyEmployee = helperFunctions.dummyEmployee(req);
+// /**
+//  * PUT /EmployeeService/employees/inactive/:employeeID
+//  * @summary Toggle the active/inactive status of any employee.
+//  * @response 200 - Successfully updated employee.
+//  * @response 400 - Bad request, invalid input.
+//  * @response 404 - Not found, employee with the specified ID does not exist.
+//  * @response 500 - Internal server error.
+//  */
+// app.put(
+//   "/EmployeeService/employees/inactive/:employeeID(\\d+)",
+//   async (req, res) => {
+//     const dummyEmployee = helperFunctions.dummyEmployee(req);
 
+//     try {
+//       try {
+//         const ok = await ea.activeInactiveEmployee(dummyEmployee);
+
+//         if (ok) {
+//           res.status(200).json({ err: null, data: true });
+//           return;
+//         }
+//         res.status(404).json({ err: errorMsg.NOT_FOUND_ERROR, data: null });
+//       } catch (e) {
+//         res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+//       }
+//     } catch (e) {
+//       res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
+//     }
+//   }
+// );
+
+app.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
+  const dummyEmployee = helperFunctions.dummyEmployee(req);
+
+  try {
     try {
-      try {
-        const ok = await ea.activeInactiveEmployee(dummyEmployee);
-
-        if (ok) {
-          res.status(200).json({ err: null, data: true });
-          return;
-        }
-        res.status(404).json({ err: errorMsg.NOT_FOUND_ERROR, data: null });
-      } catch (e) {
-        res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+      const ok = await ea.inactiveEmployee(dummyEmployee);
+      console.log(ok);
+      if (ok) {
+        res.status(200).json({ err: null, data: true });
+        return;
       }
+      res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
     } catch (e) {
-      res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
+      res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
     }
+  } catch (e) {
+    res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
   }
-);
+});
+
+app.put("/EmployeeService/active/:employeeID(\\d+)", async (req, res) => {
+  const dummyEmployee = helperFunctions.dummyEmployee(req);
+
+  try {
+    try {
+      const ok = await ea.activeEmployee(dummyEmployee);
+
+      if (ok) {
+        res.status(200).json({ err: null, data: true });
+        return;
+      }
+      res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
+    } catch (e) {
+      res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+    }
+  } catch (e) {
+    res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
+  }
+});
 
 /**
  * PUT /EmployeeService/employees/lock/:employeeID
@@ -145,6 +189,44 @@ app.put(
     }
   }
 );
+
+app.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
+  const dummyEmployee = helperFunctions.dummyEmployee(req);
+
+  const ok = await ea.lockEmployee(dummyEmployee);
+  try {
+    try {
+      if (ok) {
+        res.status(200).json({ err: null, data: true });
+        return;
+      }
+      res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
+    } catch (e) {
+      res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+    }
+  } catch (e) {
+    res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
+  }
+});
+
+app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
+  const dummyEmployee = helperFunctions.dummyEmployee(req);
+
+  const ok = await ea.unlockEmployee(dummyEmployee);
+  try {
+    try {
+      if (ok) {
+        res.status(200).json({ err: null, data: true });
+        return;
+      }
+      res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
+    } catch (e) {
+      res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+    }
+  } catch (e) {
+    res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
+  }
+});
 
 //---------------Invalid Routes---------------------------
 app.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
@@ -200,3 +282,13 @@ app.put("/EmployeeService/employees", async (req, res) => {
 });
 
 app.listen(8080, () => console.log("Server listening on port 8080"));
+
+async function hashPassword(plainPassword) {
+  try {
+    const hash = await bcrypt.hash(plainPassword, saltRounds);
+    console.log("Hashed Password:", hash);
+    return hash;
+  } catch (err) {
+    console.error("Error hashing password:", err);
+  }
+}

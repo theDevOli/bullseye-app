@@ -149,26 +149,33 @@ export async function addEmployee(employee) {
 }
 
 /**
- * Toggles active/inactive status of an employee in the database.
- * @param {Employee} employee - The employee object.
- * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
+ * Checks if an employee is active based on their employee ID.
+ * @param {*} employee - The employee object.
+ * @returns {boolean} - Returns true if the employee is active, false otherwise.
  */
-async function activeInactiveEmployee(employee) {
-  const ok = await employeeExist(employee);
+async function isActive(employee) {
+  const id = employee.getEmployeeID();
+  const ok = employeeExist(employee);
+  if (!ok) return false;
+  const employeeDatabase = await getEmployeeByID(id);
+  return 1 === employeeDatabase.getActive();
+}
+
+/**
+ * Activates an employee by updating their 'active' status to 1 in the database.
+ * @param {*} employee - The employee object.
+ * @returns {boolean} - Returns true if the employee is successfully activated, false otherwise.
+ */
+async function activeEmployee(employee) {
+  const ok = await isActive(employee);
   if (!ok) return false;
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
-
   const employeeID = employee.getEmployeeID();
-  const databaseEmployee = await getEmployeeByID(employeeID);
-
-  let newStatus = !Boolean(databaseEmployee.getActive());
-  newStatus = Number(newStatus);
-
   try {
     const [result] = await pool.query(
       `UPDATE employee SET active = ? WHERE employeeID =?`,
-      [newStatus, employeeID]
+      [1, employeeID]
     );
     return result.affectedRows === 1;
   } catch (e) {
@@ -178,6 +185,62 @@ async function activeInactiveEmployee(employee) {
     conn.closePool();
   }
 }
+
+/**
+ * Deactivates an employee by updating their 'active' status to 0 in the database.
+ * @param {*} employee - The employee object.
+ * @returns {boolean} - Returns true if the employee is successfully deactivated, false otherwise.
+ */
+async function inactiveEmployee(employee) {
+  const ok = await isActive(employee);
+  if (!ok) return false;
+  const conn = new Connectiondb(host, port, user, password, database);
+  const pool = conn.getPool();
+  const employeeID = employee.getEmployeeID();
+  try {
+    const [result] = await pool.query(
+      `UPDATE employee SET active = ? WHERE employeeID =?`,
+      [0, employeeID]
+    );
+    return result.affectedRows === 1;
+  } catch (e) {
+    console.error(e);
+    return false;
+  } finally {
+    conn.closePool();
+  }
+}
+
+// /**
+//  * Toggles active/inactive status of an employee in the database.
+//  * @param {Employee} employee - The employee object.
+//  * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
+//  */
+// async function activeInactiveEmployee(employee) {
+//   const ok = await employeeExist(employee);
+//   if (!ok) return false;
+//   const conn = new Connectiondb(host, port, user, password, database);
+//   const pool = conn.getPool();
+
+//   const employeeID = employee.getEmployeeID();
+//   const databaseEmployee = await getEmployeeByID(employeeID);
+
+//   let newStatus = !Boolean(databaseEmployee.getActive());
+//   newStatus = Number(newStatus);
+
+//   try {
+//     const [result] = await pool.query(
+//       `UPDATE employee SET active = ? WHERE employeeID =?`,
+//       [newStatus, employeeID]
+//     );
+//     return result.affectedRows === 1;
+//   } catch (e) {
+//     console.error(e);
+//     return false;
+//   } finally {
+//     conn.closePool();
+//   }
+// }
 
 /**
  * Updates an existing employee in the database.
@@ -262,28 +325,25 @@ async function updateEmployee(employee) {
   }
 }
 
-/**
- * Toggles locked/unlocked status of an employee in the database.
- * @param {Employee} employee - The employee object.
- * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
- */
-async function lockEmployee(employee) {
-  const ok = await employeeExist(employee);
+async function isLocked(employee) {
+  const id = employee.getEmployeeID();
+  const ok = employeeExist(employee);
   if (!ok) return false;
+  const employeeDatabase = await getEmployeeByID(id);
+  return 1 === employeeDatabase.getLocked();
+}
 
+async function lockEmployee(employee) {
+  const ok = await isLocked(employee);
+  console.log(ok);
+  if (ok) return false;
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
-
   const employeeID = employee.getEmployeeID();
-  const databaseEmployee = await getEmployeeByID(employeeID);
-
-  let newStatus = !Boolean(databaseEmployee.getLocked());
-  newStatus = Number(newStatus);
-
   try {
     const [result] = await pool.query(
       `UPDATE employee SET locked = ? WHERE employeeID =?`,
-      [newStatus, employeeID]
+      [1, employeeID]
     );
     return result.affectedRows === 1;
   } catch (e) {
@@ -292,14 +352,84 @@ async function lockEmployee(employee) {
   }
 }
 
+async function unlockEmployee(employee) {
+  const ok = await isLocked(employee);
+  console.log(ok);
+  if (ok) return false;
+  const conn = new Connectiondb(host, port, user, password, database);
+  const pool = conn.getPool();
+  const employeeID = employee.getEmployeeID();
+  try {
+    const [result] = await pool.query(
+      `UPDATE employee SET locked = ? WHERE employeeID =?`,
+      [0, employeeID]
+    );
+    return result.affectedRows === 1;
+  } catch (e) {
+  } finally {
+    conn.closePool();
+  }
+}
+
+// async function changeEmployeePassword(employee) {
+//   const ok = employeeExist(employee);
+//   if (!ok) return false;
+//   const conn = new Connectiondb(host, port, user, password, database);
+//   const pool = conn.getPool();
+//   const employeeID = employee.getEmployeeID();
+//   try {
+//     const [result] = await pool.query(
+//       `UPDATE employee SET password = ? WHERE employeeID =?`,
+//       [0, employeeID]
+//     );
+//     return result.affectedRows === 1;
+//   } catch (e) {
+//   } finally {
+//     conn.closePool();
+//   }
+// }
+// /**
+//  * Toggles locked/unlocked status of an employee in the database.
+//  * @param {Employee} employee - The employee object.
+//  * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
+//  */
+// async function lockEmployee(employee) {
+//   const ok = await employeeExist(employee);
+//   if (!ok) return false;
+
+//   const conn = new Connectiondb(host, port, user, password, database);
+//   const pool = conn.getPool();
+
+//   const employeeID = employee.getEmployeeID();
+//   const databaseEmployee = await getEmployeeByID(employeeID);
+
+//   let newStatus = !Boolean(databaseEmployee.getLocked());
+//   newStatus = Number(newStatus);
+
+//   try {
+//     const [result] = await pool.query(
+//       `UPDATE employee SET locked = ? WHERE employeeID =?`,
+//       [newStatus, employeeID]
+//     );
+//     return result.affectedRows === 1;
+//   } catch (e) {
+//   } finally {
+//     conn.closePool();
+//   }
+// }
+
 const ea = {
   getAllEmployees,
   getEmployeeByID,
   employeeExist,
   addEmployee,
-  activeInactiveEmployee,
+  // activeInactiveEmployee,
   updateEmployee,
+  activeEmployee,
+  inactiveEmployee,
   lockEmployee,
+  unlockEmployee,
+  // changeEmployeePassword,
 };
 
 export default ea;

@@ -3,19 +3,17 @@ import { useEffect, useState } from "react";
 
 import styles from "./Logout.module.css";
 import Button from "../Button/Button";
-// import dotenv from "dotenv";
-// dotenv.config({ path: "../../.env" });
-// const TIME = +process.env.LOGOUT_TIME;
-const TIME = 1200;
+
+import { LOGOUT_TIME } from "../../../Utils/Constants";
 
 function Logout() {
   const { logout } = useAuth();
-  const [seconds, setSeconds] = useState(TIME);
+  const [seconds, setSeconds] = useState(LOGOUT_TIME);
   const mins = Math.floor(seconds / 60);
   const sec = seconds % 60;
 
   const resetTimer = () => {
-    setSeconds(TIME); // Reset the timer to 1200 seconds (20 minutes)
+    setSeconds(LOGOUT_TIME); // Reset the timer to 1200 seconds (20 minutes)
   };
 
   useEffect(() => {

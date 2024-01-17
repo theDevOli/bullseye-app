@@ -3,9 +3,11 @@ import Header from "../../component/Header/Header";
 import Footer from "../../component/Footer/Footer";
 import Error from "../../component/Error/Error";
 
+import helperFunctions from "../../../Utils/helperFunctions";
+
 import styles from "./Help.module.css";
 import { NavLink } from "react-router-dom";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import errorMsg from "../../../Utils/errorMsg";
 
 const initialState = {
@@ -13,6 +15,7 @@ const initialState = {
   newPassword: "",
   confirmPassword: "",
   error: null,
+  hashPassword: "",
 };
 
 function reducer(state, action) {
@@ -27,6 +30,14 @@ function reducer(state, action) {
       return { ...state, error: action.payload };
     case "notMatched":
       return { ...state, error: action.payload };
+    case "upperCase":
+      return { ...state, error: action.payload };
+    case "minLength":
+      return { ...state, error: action.payload };
+    case "special":
+      return { ...state, error: action.payload };
+    case "reset":
+      return { ...state, hashPassword: state.payload };
     default:
       throw new Error("Unknown action");
   }
@@ -37,10 +48,32 @@ function reducer(state, action) {
  * @returns {JSX.Element} - The rendered Help page.
  */
 function Help() {
-  const [{ name, newPassword, confirmPassword, error }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [
+    { name, newPassword, confirmPassword, error, hashPassword },
+    dispatch,
+  ] = useReducer(reducer, initialState);
+
+  // useEffect(
+  //   function () {
+  //     async function changePassword() {
+  //       const requestOptions = {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           password: hashPassword,
+  //         }),
+  //       };
+  //       const res = await fetch(
+  //         `127.0.0.1:8080/EmployeeService/employees/1`,
+  //         requestOptions
+  //       );
+  //     }
+  //   },
+  //   [hashPassword]
+  // );
+
   function resetPassword() {
     if (!name || !newPassword || !confirmPassword) {
       dispatch({
@@ -57,12 +90,42 @@ function Help() {
       });
       return;
     }
+
+    if (!newPassword.match(/[A-Z]/)) {
+      dispatch({
+        type: "upperCase",
+        payload: errorMsg.UPPERCASE_ERROR,
+      });
+    }
+
+    if (!newPassword.length > 8) {
+      dispatch({
+        type: "minLength",
+        payload: errorMsg.MIN_LEN_ERROR,
+      });
+    }
+
+    if (!newPassword.match(/[!\@\#\$\%\^\&\*\(\)\-\+\=\?\<\>\.\,]/)) {
+      dispatch({
+        type: "special",
+        payload: errorMsg.SPECIAL_ERROR,
+      });
+    }
+
+    // if (!error) {
+    //   const hash = helperFunctions.hashPassword(newPassword);
+    //   dispatch({
+    //     type: "reset",
+    //     payload: hash,
+    //   });
+    // }
   }
+
   return (
     <div className={styles.help}>
       <Header type="loginHeader">Reset Password</Header>
 
-      <form className={styles.helpBox}>
+      <div className={styles.helpBox}>
         <h1>Reset Password</h1>
 
         <div>
@@ -106,7 +169,7 @@ function Help() {
             </NavLink>
           </Button>
         </div>
-      </form>
+      </div>
 
       {error && <Error>{error}</Error>}
 

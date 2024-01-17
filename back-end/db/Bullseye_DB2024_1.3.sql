@@ -94,7 +94,7 @@ CREATE TABLE `site` (
 --
 CREATE TABLE `employee` (
   `employeeID` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `Password` varchar(32) NOT NULL,
+  `Password` varchar(255) NOT NULL,
   `FirstName` varchar(20) NOT NULL,
   `LastName` varchar(20) NOT NULL,
   `Email` varchar(100) DEFAULT NULL,

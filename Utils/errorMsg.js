@@ -93,6 +93,32 @@ const MISSING_OUTPUT_ERROR =
 const NOT_MATCHED_ERROR =
   "Fields does not match: The new password field must be equal to confirm password field.";
 
+/**
+ *Minimum length error message
+ *@type {string}
+ *@constant
+ *@description Message: "Password rules: At least one latter must be uppercase."
+ */
+const MIN_LEN_ERROR = "Password rules: At least 8 characters long.";
+
+/**
+ *Uppercase error message
+ *@type {string}
+ *@constant
+ *@description Message: "Password rules: At least one letter must be uppercase."
+ */
+const UPPERCASE_ERROR =
+  "Password rules: At least one letter must be uppercase.";
+
+/**
+ *Uppercase error message
+ *@type {string}
+ *@constant
+ *@description Message: "Password rules: At least one latter must be uppercase."
+ */
+const SPECIAL_ERROR =
+  "Password rules: At least one letter must be a special character.";
+
 // /**
 //  *Not found user login error message
 //  *@type {string}
@@ -118,6 +144,9 @@ const errorMsg = {
   LOCKED_ERROR,
   MISSING_OUTPUT_ERROR,
   NOT_MATCHED_ERROR,
+  MIN_LEN_ERROR,
+  UPPERCASE_ERROR,
+  SPECIAL_ERROR,
 };
 
 export default errorMsg;

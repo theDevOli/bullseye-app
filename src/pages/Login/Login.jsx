@@ -75,6 +75,7 @@ function Login() {
           Login
         </Button>
       </form>
+
       {error && <Error>{error}</Error>}
       <Footer />
     </div>

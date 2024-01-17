@@ -1,4 +1,7 @@
 import Employee from "../back-end/entity/Employee.js";
+// import bcrypt from "bcrypt";
+
+// const saltRounds = 10;
 
 /**
  *Retrieves employee data in a structured format.
@@ -26,7 +29,7 @@ function getEmployeeData(employee) {
  * @param {*} req - The HTTP request object.
  * @returns {Employee} - An instance of the Employee class.
  */
-function instantiateEmployee(req) {
+function instantiateEmployee(req, hash) {
   const body = req.body;
   return new Employee(
     body.employeeID,
@@ -38,7 +41,7 @@ function instantiateEmployee(req) {
     body.PositionID,
     body.siteID,
     body.locked,
-    body.password,
+    hash,
     body.notes
   );
 }
@@ -84,11 +87,37 @@ function dummyEmployee(req) {
   );
 }
 
+// async function hashPassword(plainPassword) {
+//   try {
+//     const hash = await bcrypt.hash(plainPassword, saltRounds);
+//     console.log("Hashed Password:", hash);
+//     return hash;
+//   } catch (err) {
+//     console.error("Error hashing password:", err);
+//   }
+// }
+
+// async function comparePasswords(enteredPassword, storedHashedPassword) {
+//   try {
+//     const result = await bcrypt.compare(enteredPassword, storedHashedPassword);
+//     if (result) {
+//       console.log("Password match!");
+//     } else {
+//       console.log("Password does not match!");
+//     }
+//     return result;
+//   } catch (err) {
+//     console.error("Error comparing passwords:", err);
+//   }
+// }
+
 const helperFunctions = {
   getEmployeeData,
   instantiateEmployee,
   dummyEmployee,
   ajaxRequest,
+  // hashPassword,
+  // comparePasswords,
 };
 
 export default helperFunctions;
