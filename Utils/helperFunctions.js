@@ -1,4 +1,5 @@
 import Employee from "../back-end/entity/Employee.js";
+import Audit from "../back-end/entity/Audit.js";
 // import bcrypt from "bcrypt";
 
 // const saltRounds = 10;
@@ -24,6 +25,24 @@ function getEmployeeData(employee) {
   };
 }
 
+/**
+ *Retrieves audit data in a structured format.
+ * @param {Audit} audit - The audit object containing data.
+ * @returns {Object} - An object containing audit data.
+ */
+function getAuditData(audit) {
+  return {
+    auditID: audit.getAuditID(),
+    transactionID: audit.getTransactionID(),
+    type: audit.getType(),
+    status: audit.getStatus(),
+    date: audit.getDate(),
+    siteID: audit.getSiteID(),
+    deliveryID: audit.getDeliveryID(),
+    // employeeID:audit.getEmployeeID(),
+    notes: audit.getNotes(),
+  };
+}
 /**
  *
  * @param {*} req - The HTTP request object.
@@ -113,6 +132,7 @@ function dummyEmployee(req) {
 
 const helperFunctions = {
   getEmployeeData,
+  getAuditData,
   instantiateEmployee,
   dummyEmployee,
   ajaxRequest,

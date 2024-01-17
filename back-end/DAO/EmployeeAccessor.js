@@ -19,9 +19,9 @@ const database = process.env.MYSQL_DATABASE;
 export async function getAllEmployees() {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
+  let results = [];
   try {
     const [rows] = await pool.query("SELECT * FROM employee");
-    let results = [];
     rows.forEach((row) => {
       const employee = new Employee(
         row.employeeID,
@@ -41,6 +41,7 @@ export async function getAllEmployees() {
     return results;
   } catch (e) {
     console.error(e);
+    return results;
   } finally {
     conn.closePool();
   }
@@ -49,7 +50,7 @@ export async function getAllEmployees() {
 /**
  * Retrieves an employee from the database by id.
  * @param {number} id - employeeID.
- * @returns {Promise<Employee>} An Employee object.
+ * @returns {Promise<Audit | null>} An Employee object if found, otherwise null.
  */
 export async function getEmployeeByID(id) {
   const conn = new Connectiondb(host, port, user, password, database);
@@ -77,6 +78,7 @@ export async function getEmployeeByID(id) {
     return employee;
   } catch (e) {
     console.error(e);
+    return null;
   } finally {
     conn.closePool();
   }
@@ -95,6 +97,7 @@ export async function employeeExist(employee) {
     return databaseEmployee !== null;
   } catch (e) {
     console.error(e);
+    return false;
   }
 }
 
@@ -150,8 +153,8 @@ export async function addEmployee(employee) {
 
 /**
  * Checks if an employee is active based on their employee ID.
- * @param {*} employee - The employee object.
- * @returns {boolean} - Returns true if the employee is active, false otherwise.
+ * @param {Employee} employee - The employee object.
+ * @returns {Promise<boolean>} - Returns true if the employee is active, false otherwise.
  */
 async function isActive(employee) {
   const id = employee.getEmployeeID();
@@ -163,8 +166,8 @@ async function isActive(employee) {
 
 /**
  * Activates an employee by updating their 'active' status to 1 in the database.
- * @param {*} employee - The employee object.
- * @returns {boolean} - Returns true if the employee is successfully activated, false otherwise.
+ * @param {Employee} employee - The employee object.
+ * @returns {Promise<boolean>} - Returns true if the employee is successfully activated, false otherwise.
  */
 async function activeEmployee(employee) {
   const ok = await isActive(employee);
@@ -188,8 +191,8 @@ async function activeEmployee(employee) {
 
 /**
  * Deactivates an employee by updating their 'active' status to 0 in the database.
- * @param {*} employee - The employee object.
- * @returns {boolean} - Returns true if the employee is successfully deactivated, false otherwise.
+ * @param {Employee} employee - The employee object.
+ * @returns {Promise<boolean>} - Returns true if the employee is successfully deactivated, false otherwise.
  */
 async function inactiveEmployee(employee) {
   const ok = await isActive(employee);
@@ -325,6 +328,11 @@ async function updateEmployee(employee) {
   }
 }
 
+/**
+ * Checks if an employee is locked based on their employee ID.
+ * @param {Employee} employee - The Employee object to check for locked status.
+ * @returns {Promise<boolean>} True if the employee is locked, false otherwise or if an error occurs.
+ */
 async function isLocked(employee) {
   const id = employee.getEmployeeID();
   const ok = employeeExist(employee);
@@ -333,6 +341,11 @@ async function isLocked(employee) {
   return 1 === employeeDatabase.getLocked();
 }
 
+/**
+ * Locks an employee by updating their 'locked' status to 1 in the database.
+ * @param {Employee} employee - The Employee object to be locked.
+ * @returns {Promise<boolean>} True if the employee is successfully locked, false otherwise or if an error occurs.
+ */
 async function lockEmployee(employee) {
   const ok = await isLocked(employee);
   console.log(ok);
@@ -352,6 +365,11 @@ async function lockEmployee(employee) {
   }
 }
 
+/**
+ * Unlocks an employee by updating their 'locked' status to 0 in the database.
+ * @param {Employee} employee - The Employee object to be unlocked.
+ * @returns {Promise<boolean>} True if the employee is successfully unlocked, false otherwise or if an error occurs.
+ */
 async function unlockEmployee(employee) {
   const ok = await isLocked(employee);
   console.log(ok);
@@ -370,53 +388,6 @@ async function unlockEmployee(employee) {
     conn.closePool();
   }
 }
-
-// async function changeEmployeePassword(employee) {
-//   const ok = employeeExist(employee);
-//   if (!ok) return false;
-//   const conn = new Connectiondb(host, port, user, password, database);
-//   const pool = conn.getPool();
-//   const employeeID = employee.getEmployeeID();
-//   try {
-//     const [result] = await pool.query(
-//       `UPDATE employee SET password = ? WHERE employeeID =?`,
-//       [0, employeeID]
-//     );
-//     return result.affectedRows === 1;
-//   } catch (e) {
-//   } finally {
-//     conn.closePool();
-//   }
-// }
-// /**
-//  * Toggles locked/unlocked status of an employee in the database.
-//  * @param {Employee} employee - The employee object.
-//  * @returns {Promise<boolean>} True if the status is updated successfully, false otherwise.
-//  */
-// async function lockEmployee(employee) {
-//   const ok = await employeeExist(employee);
-//   if (!ok) return false;
-
-//   const conn = new Connectiondb(host, port, user, password, database);
-//   const pool = conn.getPool();
-
-//   const employeeID = employee.getEmployeeID();
-//   const databaseEmployee = await getEmployeeByID(employeeID);
-
-//   let newStatus = !Boolean(databaseEmployee.getLocked());
-//   newStatus = Number(newStatus);
-
-//   try {
-//     const [result] = await pool.query(
-//       `UPDATE employee SET locked = ? WHERE employeeID =?`,
-//       [newStatus, employeeID]
-//     );
-//     return result.affectedRows === 1;
-//   } catch (e) {
-//   } finally {
-//     conn.closePool();
-//   }
-// }
 
 const ea = {
   getAllEmployees,

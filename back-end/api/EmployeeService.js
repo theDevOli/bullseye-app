@@ -42,8 +42,9 @@ app.get("/EmployeeService/employees", async (req, res) => {
  * @response 500 - Internal server error.
  */
 app.post("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
+  const hash = await bcrypt.hash(req.body.password, saltRounds);
   try {
-    const employee = helperFunctions.instantiateEmployee(req);
+    const employee = helperFunctions.instantiateEmployee(req, hash);
     try {
       const ok = await ea.addEmployee(employee);
       if (ok) {
@@ -68,7 +69,7 @@ app.post("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
  * @response 500 - Internal server error.
  */
 app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
-  const hash = await hashPassword(req.body.password);
+  const hash = await bcrypt.hash(req.body.password, saltRounds);
   try {
     const employee = helperFunctions.instantiateEmployee(req, hash);
 
@@ -120,6 +121,14 @@ app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
 //   }
 // );
 
+/**
+ * PUT /EmployeeService/inactive/:employeeID(\\d+)
+ * @summary Deactivate an employee by updating their 'active' status to 0 in the database.
+ * @response 200 - Successfully deactivate employee.
+ * @response 400 - Bad request, invalid input.
+ * @response 409 - Conflict, employee already active.
+ * @response 500 - Internal server error.
+ */
 app.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
@@ -140,6 +149,14 @@ app.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
   }
 });
 
+/**
+ * PUT /EmployeeService/active/:employeeID(\\d+)
+ * @summary Activate an employee by updating their 'active' status to 1 in the database.
+ * @response 200 - Successfully deactivate employee.
+ * @response 400 - Bad request, invalid input.
+ * @response 409 - Conflict, employee is already inactive.
+ * @response 500 - Internal server error.
+ */
 app.put("/EmployeeService/active/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
@@ -190,6 +207,14 @@ app.put(
   }
 );
 
+/**
+ * PUT /EmployeeService/lock/:employeeID(\\d+)
+ * @summary Lock an employee by updating their 'locked' status to 1 in the database.
+ * @response 200 - Successfully updated employee.
+ * @response 400 - Bad request, invalid input.
+ * @response 409 - Conflict, employee is already locked.
+ * @response 500 - Internal server error.
+ */
 app.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
@@ -209,6 +234,14 @@ app.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
   }
 });
 
+/**
+ * PUT /EmployeeService/unlock/:employeeID(\\d+)
+ * @summary Unlock an employee by updating their 'locked' status to 0 in the database. status to 1 in the database.
+ * @response 200 - Successfully updated employee.
+ * @response 400 - Bad request, invalid input.
+ * @response 409 - Conflict, employee is already unlocked.
+ * @response 500 - Internal server error.
+ */
 app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
@@ -228,6 +261,14 @@ app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
   }
 });
 
+/**
+ * POST /login
+ * @summary Authenticate a user login.
+ * @response 200 - Successfully authenticated user..
+ * @response 401 - Unauthorized, incorrect password.
+ * @response 440 - Timeout, user session has expired.
+ * @response 500 - Internal server error.
+ */
 app.post("/login", async (req, res) => {
   const { enteredPassword, storedHashedPassword, isTimeOut } = req.body;
 
@@ -236,7 +277,7 @@ app.post("/login", async (req, res) => {
     return;
   }
 
-  const ok = await comparePasswords(enteredPassword, storedHashedPassword);
+  const ok = await bcrypt.compare(enteredPassword, storedHashedPassword);
 
   if (!ok) {
     res.status(401).json({ err: errorMsg.UNAUTHORIZED_ERROR, data: null });
@@ -246,20 +287,25 @@ app.post("/login", async (req, res) => {
 });
 
 //---------------Invalid Routes---------------------------
+/**
+ * GET /EmployeeService/employees/:employeeID(\\d+)
+ * @summary Retrieve a single employee by ID.
+ * @response 405 - Method Not Allowed, retrieving a single employee is not allowed.
+ */
 app.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
-  // res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
-  const id = Number(req.params.employeeID);
-  try {
-    const data = await ea.getEmployeeByID(id);
+  res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
+  // const id = Number(req.params.employeeID);
+  // try {
+  //   const data = await ea.getEmployeeByID(id);
 
-    if (!data) {
-      res.status(404).json({ err: errorMsg.NOT_FOUND_ERROR, data: null });
-      return;
-    }
-    res.status(200).json({ err: null, data: data });
-  } catch (err) {
-    res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
-  }
+  //   if (!data) {
+  //     res.status(404).json({ err: errorMsg.NOT_FOUND_ERROR, data: null });
+  //     return;
+  //   }
+  //   res.status(200).json({ err: null, data: data });
+  // } catch (err) {
+  //   res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+  // }
 });
 
 /**
@@ -299,27 +345,3 @@ app.put("/EmployeeService/employees", async (req, res) => {
 });
 
 app.listen(8080, () => console.log("Server listening on port 8080"));
-
-async function hashPassword(plainPassword) {
-  try {
-    const hash = await bcrypt.hash(plainPassword, saltRounds);
-    console.log("Hashed Password:", hash);
-    return hash;
-  } catch (err) {
-    console.error("Error hashing password:", err);
-  }
-}
-
-async function comparePasswords(enteredPassword, storedHashedPassword) {
-  try {
-    const result = await bcrypt.compare(enteredPassword, storedHashedPassword);
-    if (result) {
-      console.log("Password match!");
-    } else {
-      console.log("Password does not match!");
-    }
-    return result;
-  } catch (err) {
-    console.error("Error comparing passwords:", err);
-  }
-}
