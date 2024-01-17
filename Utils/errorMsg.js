@@ -40,6 +40,22 @@ const BAD_REQUEST_ERROR =
 const NOT_FOUND_ERROR = "Not found: The request could not be found.";
 
 /**
+ *Unauthorized error message
+ *@type {string}
+ *@constant
+ *@description Message: "Invalid username/password: Unauthorized user, invalid username or password."
+ */
+const UNAUTHORIZED_ERROR =
+  "Invalid username/password: Unauthorized user, invalid username or password.";
+/**
+ *Time out error message
+ *@type {string}
+ *@constant
+ *@description Message: "Invalid username/password: Please do the login again."
+ */
+const TIME_OUT_ERROR = "Session has expired: Please do the login again.";
+
+/**
  *Unsupported bulk operation error message
  *@type {string}
  *@constant
@@ -138,6 +154,8 @@ const errorMsg = {
   CONFLICT_ADD_ERROR,
   BAD_REQUEST_ERROR,
   NOT_FOUND_ERROR,
+  UNAUTHORIZED_ERROR,
+  TIME_OUT_ERROR,
   BULK_ERROR,
   SINGLE_ERROR,
   LOGIN_ERROR,

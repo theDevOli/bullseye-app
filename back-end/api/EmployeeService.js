@@ -228,6 +228,23 @@ app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
   }
 });
 
+app.post("/login", async (req, res) => {
+  const { enteredPassword, storedHashedPassword, isTimeOut } = req.body;
+
+  if (isTimeOut) {
+    res.status(440).json({ err: errorMsg.TIME_OUT_ERROR, data: null });
+    return;
+  }
+
+  const ok = await comparePasswords(enteredPassword, storedHashedPassword);
+
+  if (!ok) {
+    res.status(401).json({ err: errorMsg.UNAUTHORIZED_ERROR, data: null });
+    return;
+  }
+  res.status(200).json({ err: null, data: true });
+});
+
 //---------------Invalid Routes---------------------------
 app.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
   // res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
@@ -290,5 +307,19 @@ async function hashPassword(plainPassword) {
     return hash;
   } catch (err) {
     console.error("Error hashing password:", err);
+  }
+}
+
+async function comparePasswords(enteredPassword, storedHashedPassword) {
+  try {
+    const result = await bcrypt.compare(enteredPassword, storedHashedPassword);
+    if (result) {
+      console.log("Password match!");
+    } else {
+      console.log("Password does not match!");
+    }
+    return result;
+  } catch (err) {
+    console.error("Error comparing passwords:", err);
   }
 }
