@@ -42,9 +42,19 @@ export default class Employee {
     password = EMPLOYEE_DEFAULT_PASSWORD,
     notes = null
   ) {
-    
-    if (typeof employeeID !== 'number' || typeof username !== 'string' || typeof firstName !== 'string'||) {
-      throw new Error('Invalid data types for constructor parameters');
+    if (
+      typeof employeeID !== "number" ||
+      typeof username !== "string" ||
+      typeof firstName !== "string" ||
+      typeof lastName !== "string" ||
+      typeof email !== "string" ||
+      typeof active !== "number" ||
+      typeof positionID !== "number" ||
+      typeof siteID !== "number" ||
+      typeof locked !== "number" ||
+      typeof password !== "string"
+    ) {
+      throw new Error("Invalid data types for constructor parameters");
     }
 
     this.#employeeID = employeeID;

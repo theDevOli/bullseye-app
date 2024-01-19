@@ -34,6 +34,17 @@ export default class Audit {
     // employeeID = null,
     notes = null
   ) {
+    if (
+      typeof auditID !== "number" ||
+      typeof transactionID !== "number" ||
+      typeof type !== "string" ||
+      typeof status !== "string" ||
+      typeof date !== "date" ||
+      typeof siteID !== "number"
+    ) {
+      throw new Error("Invalid data types for constructor parameters");
+    }
+
     this.#auditID = auditID;
     this.#transactionID = transactionID;
     this.#type = type;
