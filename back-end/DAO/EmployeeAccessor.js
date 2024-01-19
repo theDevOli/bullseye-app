@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 
-import helperFunctions from "../../Utils/helperFunctions.js";
+import helperFunctions from "../Utils/helperFunctions.js";
 import Connectiondb from "../db/Conectiondb.js";
 import Employee from "../entity/Employee.js";
 
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: "../.env" });
 
 const host = process.env.MYSQL_HOST;
 const port = process.env.MYSQL_PORT;

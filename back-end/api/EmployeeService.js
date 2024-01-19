@@ -1,18 +1,19 @@
 import express from "express";
 import cors from "cors";
-
-import errorMsg from "../../Utils/errorMsg.js";
-import ea from "../DAO/EmployeeAccessor.js";
-import helperFunctions from "../../Utils/helperFunctions.js";
-
 import bcrypt from "bcrypt";
+
+import errorMsg from "../Utils/errorMsg.js";
+import ea from "../DAO/EmployeeAccessor.js";
+import helperFunctions from "../Utils/helperFunctions.js";
+import Employee from "../entity/Employee.js";
+
 const saltRounds = 10;
+const router = express.Router();
+// const app = express();
 
-const app = express();
+router.use(cors());
 
-app.use(cors());
-
-app.use(express.json());
+router.use(express.json());
 
 //===================API Routings============================
 
@@ -24,7 +25,7 @@ app.use(express.json());
  * @response 200 - Successful response with employee data.
  * @response 500 - Internal server error.
  */
-app.get("/EmployeeService/employees", async (req, res) => {
+router.get("/EmployeeService/employees", async (req, res) => {
   try {
     const data = await ea.getAllEmployees();
     res.status(200).json({ err: null, data: data });
@@ -41,24 +42,28 @@ app.get("/EmployeeService/employees", async (req, res) => {
  * @response 409 - Conflict, employee with the same ID already exists.
  * @response 500 - Internal server error.
  */
-app.post("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
-  const hash = await bcrypt.hash(req.body.password, saltRounds);
-  try {
-    const employee = helperFunctions.instantiateEmployee(req, hash);
+router.post(
+  "/EmployeeService/employees/:employeeID(\\d+)",
+  async (req, res) => {
+    const hash = await bcrypt.hash(req.body.password, saltRounds);
     try {
-      const ok = await ea.addEmployee(employee);
-      if (ok) {
-        res.status(201).json({ err: null, data: true });
-        return;
+      const employee = helperFunctions.instantiateEmployee(req, hash);
+
+      try {
+        const ok = await ea.addEmployee(employee);
+        if (ok) {
+          res.status(201).json({ err: null, data: true });
+          return;
+        }
+        res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
+      } catch (e) {
+        res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
       }
-      res.status(409).json({ err: errorMsg.CONFLICT_ADD_ERROR, data: null });
-    } catch (e) {
-      res.status(500).json({ err: errorMsg.SERVER_ERROR, data: null });
+    } catch (err) {
+      res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
     }
-  } catch (err) {
-    res.status(400).json({ err: errorMsg.BAD_REQUEST_ERROR, data: null });
   }
-});
+);
 
 /**
  * PUT /EmployeeService/employees/:employeeID
@@ -68,7 +73,7 @@ app.post("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
  * @response 404 - Not found, employee with the specified ID does not exist.
  * @response 500 - Internal server error.
  */
-app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
+router.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
   const hash = await bcrypt.hash(req.body.password, saltRounds);
   try {
     const employee = helperFunctions.instantiateEmployee(req, hash);
@@ -98,7 +103,7 @@ app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
 //  * @response 404 - Not found, employee with the specified ID does not exist.
 //  * @response 500 - Internal server error.
 //  */
-// app.put(
+// router.put(
 //   "/EmployeeService/employees/inactive/:employeeID(\\d+)",
 //   async (req, res) => {
 //     const dummyEmployee = helperFunctions.dummyEmployee(req);
@@ -129,7 +134,7 @@ app.put("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
  * @response 409 - Conflict, employee already active.
  * @response 500 - Internal server error.
  */
-app.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
+router.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
   try {
@@ -157,7 +162,7 @@ app.put("/EmployeeService/inactive/:employeeID(\\d+)", async (req, res) => {
  * @response 409 - Conflict, employee is already inactive.
  * @response 500 - Internal server error.
  */
-app.put("/EmployeeService/active/:employeeID(\\d+)", async (req, res) => {
+router.put("/EmployeeService/active/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
   try {
@@ -185,7 +190,7 @@ app.put("/EmployeeService/active/:employeeID(\\d+)", async (req, res) => {
  * @response 404 - Not found, employee with the specified ID does not exist.
  * @response 500 - Internal server error.
  */
-app.put(
+router.put(
   "/EmployeeService/employees/lock/:employeeID(\\d+)",
   async (req, res) => {
     const dummyEmployee = helperFunctions.dummyEmployee(req);
@@ -215,7 +220,7 @@ app.put(
  * @response 409 - Conflict, employee is already locked.
  * @response 500 - Internal server error.
  */
-app.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
+router.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
   const ok = await ea.lockEmployee(dummyEmployee);
@@ -242,7 +247,7 @@ app.put("/EmployeeService/lock/:employeeID(\\d+)", async (req, res) => {
  * @response 409 - Conflict, employee is already unlocked.
  * @response 500 - Internal server error.
  */
-app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
+router.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
   const dummyEmployee = helperFunctions.dummyEmployee(req);
 
   const ok = await ea.unlockEmployee(dummyEmployee);
@@ -269,7 +274,7 @@ app.put("/EmployeeService/unlock/:employeeID(\\d+)", async (req, res) => {
  * @response 440 - Timeout, user session has expired.
  * @response 500 - Internal server error.
  */
-app.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { enteredPassword, storedHashedPassword, isTimeOut } = req.body;
 
   if (isTimeOut) {
@@ -292,7 +297,7 @@ app.post("/login", async (req, res) => {
  * @summary Retrieve a single employee by ID.
  * @response 405 - Method Not Allowed, retrieving a single employee is not allowed.
  */
-app.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
+router.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
   res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
   // const id = Number(req.params.employeeID);
   // try {
@@ -313,16 +318,19 @@ app.get("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
  * @summary Delete an employee by ID.
  * @response 405 - Method Not Allowed, deleting a single employee is not allowed.
  */
-app.delete("/EmployeeService/employees/:employeeID(\\d+)", async (req, res) => {
-  res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
-});
+router.delete(
+  "/EmployeeService/employees/:employeeID(\\d+)",
+  async (req, res) => {
+    res.status(405).json({ err: errorMsg.SINGLE_ERROR, data: null });
+  }
+);
 
 /**
  * DELETE /employees
  * @summary Delete all employees.
  * @response 405 - Method Not Allowed, bulk delete is not allowed.
  */
-app.delete("/EmployeeService/employees", async (req, res) => {
+router.delete("/EmployeeService/employees", async (req, res) => {
   res.status(405).json({ err: errorMsg.BULK_ERROR, data: null });
 });
 
@@ -331,7 +339,7 @@ app.delete("/EmployeeService/employees", async (req, res) => {
  * @summary Add a new employee (bulk).
  * @response 405 - Method Not Allowed, bulk add is not allowed.
  */
-app.post("/EmployeeService/employees", async (req, res) => {
+router.post("/EmployeeService/employees", async (req, res) => {
   res.status(405).json({ err: errorMsg.BULK_ERROR, data: null });
 });
 
@@ -340,8 +348,8 @@ app.post("/EmployeeService/employees", async (req, res) => {
  * @summary Update an employee (bulk).
  * @response 405 - Method Not Allowed, bulk update is not allowed.
  */
-app.put("/EmployeeService/employees", async (req, res) => {
+router.put("/EmployeeService/employees", async (req, res) => {
   res.status(405).json({ err: errorMsg.BULK_ERROR, data: null });
 });
 
-app.listen(8080, () => console.log("Server listening on port 8080"));
+export default router;

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-import helperFunctions from "../../Utils/helperFunctions.js";
+import helperFunctions from "../Utils/helperFunctions.js";
 import Connectiondb from "../db/Conectiondb.js";
 import Audit from "../entity/Audit.js";
 

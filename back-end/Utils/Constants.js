@@ -1,0 +1,3 @@
+const EMPLOYEE_DEFAULT_PASSWORD = "P@ssw0rd-";
+
+export { EMPLOYEE_DEFAULT_PASSWORD };

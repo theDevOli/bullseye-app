@@ -1,0 +1,17 @@
+{
+  "name": "back-end",
+  "description": "Bullseye's back-end (using Node.js)",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mysql2": "^3.7.0"
+  },
+  "author": "Oli",
+  "license": "ISC"
+}

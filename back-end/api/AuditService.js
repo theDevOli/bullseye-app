@@ -1,15 +1,16 @@
 import express from "express";
 import cors from "cors";
 
-import errorMsg from "../../Utils/errorMsg.js";
+import errorMsg from "../Utils/errorMsg.js";
 import aa from "../DAO/AuditAccessor.js";
 import Audit from "../entity/Audit.js";
 
-const app = express();
+// const app = express();
+const router = express.Router();
 
-app.use(cors());
+router.use(cors());
 
-app.use(express.json());
+router.use(express.json());
 
 //---------------VALID-ROUTING-------------
 /**
@@ -18,7 +19,7 @@ app.use(express.json());
  * @response 200 - Successful response with audit data.
  * @response 500 - Internal server error.
  */
-app.get("/AuditServices/audits", async (req, res) => {
+router.get("/AuditServices/audits", async (req, res) => {
   try {
     const data = await aa.getAllAudit();
     res.status(200).json({ err: null, data: data });
@@ -27,7 +28,7 @@ app.get("/AuditServices/audits", async (req, res) => {
   }
 });
 
-app.post("/AuditServices/audits/:auditID(\\d+)", async (req, res) => {
+router.post("/AuditServices/audits/:auditID(\\d+)", async (req, res) => {
   try {
     const body = req.body;
     const audit = new Audit(
@@ -56,4 +57,4 @@ app.post("/AuditServices/audits/:auditID(\\d+)", async (req, res) => {
   }
 });
 
-app.listen(8000, () => console.log("Server listening on port 8000"));
+export default router;

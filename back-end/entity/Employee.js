@@ -1,4 +1,4 @@
-import { EMPLOYEE_DEFAULT_PASSWORD } from "../../Utils/Constants.js";
+import { EMPLOYEE_DEFAULT_PASSWORD } from "../Utils/Constants.js";
 /**
  * @module Employee
  */
@@ -42,6 +42,11 @@ export default class Employee {
     password = EMPLOYEE_DEFAULT_PASSWORD,
     notes = null
   ) {
+    
+    if (typeof employeeID !== 'number' || typeof username !== 'string' || typeof firstName !== 'string'||) {
+      throw new Error('Invalid data types for constructor parameters');
+    }
+
     this.#employeeID = employeeID;
     this.#username = username;
     this.#firstName = firstName;
