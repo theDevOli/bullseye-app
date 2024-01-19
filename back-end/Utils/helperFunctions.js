@@ -31,12 +31,14 @@ function getEmployeeData(employee) {
  * @returns {Object} - An object containing audit data.
  */
 function getAuditData(audit) {
+  let date = new Date().toISOString().split("T")[0];
   return {
     auditID: audit.getAuditID(),
     transactionID: audit.getTransactionID(),
     type: audit.getType(),
     status: audit.getStatus(),
-    date: audit.getDate(),
+    // date: audit.getDate(),
+    date,
     siteID: audit.getSiteID(),
     deliveryID: audit.getDeliveryID(),
     // employeeID:audit.getEmployeeID(),
@@ -53,11 +55,11 @@ function instantiateEmployee(req, hash) {
   return new Employee(
     body.employeeID,
     body.username,
-    body.FirstName,
-    body.LastName,
-    body.Email,
+    body.firstName,
+    body.lastName,
+    body.email,
     body.active,
-    body.PositionID,
+    body.positionID,
     body.siteID,
     body.locked,
     hash,

@@ -1,7 +1,7 @@
 /**
  * @module Audit
  */
-export class Item {
+export default class Item {
   #itemID;
   #name;
   #sku;
@@ -17,7 +17,7 @@ export class Item {
 
   /**
    * Creates an instance of Item.
-   * @param {string} itemID - Unique identifier for the item.
+   * @param {number} itemID - Unique identifier for the item.
    * @param {string} name - Name of the item.
    * @param {string} sku - Stock Keeping Unit (SKU) for the item.
    * @param {string|null} description - Optional description of the item.
@@ -26,8 +26,8 @@ export class Item {
    * @param {number} caseSize - Size of the item's case.
    * @param {number} costPrice - Cost price of the item.
    * @param {number} retailPrice - Retail price of the item.
-   * @param {string} supplierID - Unique identifier of the item's supplier.
-   * @param {boolean} active - Indicates if the item is active or inactive.
+   * @param {number} supplierID - Unique identifier of the item's supplier.
+   * @param {number} active - Indicates if the item is active or inactive.
    * @param {string|null} notes - Optional notes about the item.
    */
   constructor(
@@ -44,6 +44,20 @@ export class Item {
     active,
     notes = null
   ) {
+    if (
+      typeof itemID !== "string" ||
+      typeof name !== "string" ||
+      typeof sku !== "number" ||
+      typeof category !== "number" ||
+      typeof weight !== "number" ||
+      typeof caseSize !== "number" ||
+      typeof costPrice !== "number" ||
+      typeof retailPrice !== "number" ||
+      typeof supplierID !== "number" ||
+      typeof active !== "number"
+    ) {
+      throw new Error("Invalid data types for constructor parameters");
+    }
     this.#itemID = itemID;
     this.#name = name;
     this.#sku = sku;

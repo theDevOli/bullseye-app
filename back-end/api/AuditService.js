@@ -32,14 +32,13 @@ router.post("/AuditServices/audits/:auditID(\\d+)", async (req, res) => {
   try {
     const body = req.body;
     const audit = new Audit(
-      body.txnAuditID,
-      body.txnID,
-      body.txnType,
+      body.auditID,
+      body.transactionID,
+      body.type,
       body.status,
-      body.txnDate,
-      body.SiteID,
-      body.deliveryID,
+      body.date,
       body.siteID,
+      body.deliveryID,
       body.notes
     );
     const ok = await aa.addAudit(audit);

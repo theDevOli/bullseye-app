@@ -4,7 +4,7 @@ import helperFunctions from "../Utils/helperFunctions.js";
 import Connectiondb from "../db/Conectiondb.js";
 import Audit from "../entity/Audit.js";
 
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: "../.env" });
 
 const host = process.env.MYSQL_HOST;
 const port = process.env.MYSQL_PORT;
@@ -22,9 +22,7 @@ export async function getAllAudit() {
   let results = [];
   try {
     const [rows] = await pool.query(`SELECT * FROM txnaudit`);
-    // console.log(rows);
     rows.forEach((row) => {
-      // console.log(row, "row");
       const audit = new Audit(
         row.txnAuditID,
         row.txnID,
@@ -33,13 +31,10 @@ export async function getAllAudit() {
         row.txnDate,
         row.SiteID,
         row.deliveryID,
-        row.siteID,
         row.notes
       );
-      // console.log(audit.getAuditID(), "audit");
       results.push(audit);
     });
-    // console.log(results);
     return results;
   } catch (e) {
     console.error(e);

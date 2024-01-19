@@ -39,7 +39,6 @@ export default class Audit {
       typeof transactionID !== "number" ||
       typeof type !== "string" ||
       typeof status !== "string" ||
-      typeof date !== "date" ||
       typeof siteID !== "number"
     ) {
       throw new Error("Invalid data types for constructor parameters");

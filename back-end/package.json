@@ -13,5 +13,8 @@
     "mysql2": "^3.7.0"
   },
   "author": "Oli",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
 }
