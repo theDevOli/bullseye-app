@@ -16,7 +16,7 @@ const database = process.env.MYSQL_DATABASE;
  * Fetches all employees from the database.
  * @returns {Promise<Array<Employee>>} An array of Employee objects.
  */
-export async function getAllEmployees() {
+async function getAllEmployees() {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
   let results = [];
@@ -52,7 +52,7 @@ export async function getAllEmployees() {
  * @param {number} id - employeeID.
  * @returns {Promise<Audit | null>} An Employee object if found, otherwise null.
  */
-export async function getEmployeeByID(id) {
+async function getEmployeeByID(id) {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
   try {
@@ -89,7 +89,7 @@ export async function getEmployeeByID(id) {
  * @param {Employee} employee - The employee object.
  * @returns {Promise<boolean>} True if exists employee, false if not found.
  */
-export async function employeeExist(employee) {
+async function employeeExist(employee) {
   try {
     const id = employee.getEmployeeID();
     const databaseEmployee = await getEmployeeByID(id);
@@ -106,7 +106,7 @@ export async function employeeExist(employee) {
  * @param {Employee} employee - The employee object to be added.
  * @returns {Promise<boolean>} True if the employee is added successfully, false otherwise.
  */
-export async function addEmployee(employee) {
+async function addEmployee(employee) {
   const ok = await employeeExist(employee);
   if (ok) return false;
   const conn = new Connectiondb(host, port, user, password, database);

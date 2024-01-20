@@ -22,6 +22,7 @@ export default class Audit {
    * @param {number} siteID - The ID of the related site.
    * @param {number|null} deliveryID - The ID of the related delivery (optional).
    * @param {string|null} notes - Additional notes related to the audit (optional).
+   * @throws {Error} Throws an error if invalid data types are provided for constructor parameters.
    */
   constructor(
     auditID,

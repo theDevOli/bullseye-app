@@ -1,5 +1,5 @@
 /**
- * @module Audit
+ * @module Item
  */
 export default class Item {
   #itemID;
@@ -29,6 +29,7 @@ export default class Item {
    * @param {number} supplierID - Unique identifier of the item's supplier.
    * @param {number} active - Indicates if the item is active or inactive.
    * @param {string|null} notes - Optional notes about the item.
+   * @throws {Error} Throws an error if invalid data types are provided for constructor parameters.
    */
   constructor(
     itemID,
@@ -45,10 +46,10 @@ export default class Item {
     notes = null
   ) {
     if (
-      typeof itemID !== "string" ||
+      typeof itemID !== "number" ||
       typeof name !== "string" ||
-      typeof sku !== "number" ||
-      typeof category !== "number" ||
+      typeof sku !== "string" ||
+      typeof category !== "string" ||
       typeof weight !== "number" ||
       typeof caseSize !== "number" ||
       typeof costPrice !== "number" ||

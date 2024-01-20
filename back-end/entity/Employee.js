@@ -28,6 +28,7 @@ export default class Employee {
    * @param {number} locked - Indicates whether the employee is locked(3 attempts to login).
    * @param {string} password - The password associated with the employee.
    * @param {string} notes - Additional notes or comments about the employee.
+   * @throws {Error} Throws an error if invalid data types are provided for constructor parameters.
    */
   constructor(
     employeeID,

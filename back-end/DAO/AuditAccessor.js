@@ -16,7 +16,7 @@ const database = process.env.MYSQL_DATABASE;
  * Fetches all audit entries from the database.
  * @returns {Promise<Array<Audit>>} An array of Audit objects representing all audit entries.
  */
-export async function getAllAudit() {
+async function getAllAudit() {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
   let results = [];
@@ -49,7 +49,7 @@ export async function getAllAudit() {
  * @param {number} id - The ID of the audit entry to retrieve.
  * @returns {Promise<Audit | null>} An Audit object if found, otherwise null.
  */
-export async function getAuditByID(id) {
+async function getAuditByID(id) {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
   try {
@@ -83,7 +83,7 @@ export async function getAuditByID(id) {
  * @param {Audit} audit - The Audit object to check for existence.
  * @returns {Promise<boolean>} True if the audit entry exists, false if not found or an error occurs.
  */
-export async function auditExists(audit) {
+async function auditExists(audit) {
   try {
     const id = audit.getAuditID();
     const databaseAudit = await getAuditByID(id);
@@ -99,7 +99,7 @@ export async function auditExists(audit) {
  * @param {Audit} audit - The Audit object to be added.
  * @returns {Promise<boolean>} True if the audit entry is added successfully, false if it already exists or an error occurs.
  */
-export async function addAudit(audit) {
+async function addAudit(audit) {
   const ok = await auditExists(audit);
   if (ok) return false;
 
