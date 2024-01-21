@@ -1,8 +1,6 @@
 import Employee from "../entity/Employee.js";
 import Audit from "../entity/Audit.js";
-// import bcrypt from "bcrypt";
-
-// const saltRounds = 10;
+import Item from "../entity/Item.js";
 
 /**
  *Retrieves employee data in a structured format.
@@ -25,6 +23,27 @@ function getEmployeeData(employee) {
   };
 }
 
+/**
+ *Retrieves item data in a structured format.
+ * @param {Item} item - The item object containing data.
+ * @returns {Object} - An object containing item data.
+ */
+function getItemData(item) {
+  return {
+    itemID: item.getItemID(),
+    name: item.getName(),
+    sku: item.getSku(),
+    description: item.getDescription(),
+    category: item.getCategory(),
+    weight: item.getWeight(),
+    caseSize: item.getCaseSize(),
+    costPrice: item.getCostPrice(),
+    retailPrice: item.getRetailPrice(),
+    supplierID: item.getSupplierID(),
+    active: item.getActive(),
+    notes: item.getNotes(),
+  };
+}
 /**
  *Retrieves audit data in a structured format.
  * @param {Audit} audit - The audit object containing data.
@@ -90,6 +109,7 @@ function dummyEmployee(req) {
 const helperFunctions = {
   getEmployeeData,
   getAuditData,
+  getItemData,
   instantiateEmployee,
   dummyEmployee,
 };

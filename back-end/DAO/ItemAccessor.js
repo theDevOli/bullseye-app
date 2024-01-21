@@ -13,8 +13,8 @@ const password = process.env.MYSQL_PASSWORD;
 const database = process.env.MYSQL_DATABASE;
 
 /**
- * Fetches all audit entries from the database.
- * @returns {Promise<Array<Audit>>} An array of Audit objects representing all audit entries.
+ * Fetches all item entries from the database.
+ * @returns {Promise<Array<Item>>} An array of Item objects representing all item entries.
  */
 async function getAllItems() {
   const conn = new Connectiondb(host, port, user, password, database);
@@ -51,7 +51,7 @@ async function getAllItems() {
 /**
  * Retrieves an item from the database by id.
  * @param {number} id - itemID.
- * @returns {Promise<Audit | null>} An item object if found, otherwise null.
+ * @returns {Promise<Item | null>} An item object if found, otherwise null.
  */
 async function getItemByID(id) {
   const conn = new Connectiondb(host, port, user, password, database);
@@ -109,17 +109,198 @@ async function addItem(item) {
 
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
+
+  const {
+    itemID,
+    name,
+    sku,
+    description,
+    category,
+    weight,
+    caseSize,
+    costPrice,
+    retailPrice,
+    supplierID,
+    active,
+    notes,
+  } = helperFunctions.getItemData(item);
+
   try {
+    const [result] = await pool.query(
+      `INSERT INTO item (itemID, name, sku, description, category, weight, costPrice, retailPrice, supplierID, active, notes, caseSize) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        itemID,
+        name,
+        sku,
+        description,
+        category,
+        weight,
+        costPrice,
+        retailPrice,
+        supplierID,
+        active,
+        notes,
+        caseSize,
+      ]
+    );
+
+    return result.insertId !== undefined;
   } catch (e) {
+    console.error(e);
+    return false;
   } finally {
     conn.closePool();
   }
 }
+
+/**
+ * Updates an existing item in the database.
+ * @param {Item} item - The updated item object.
+ * @returns {Promise<boolean>} True if the item is updated successfully, false otherwise.
+ */
+async function updateItem(item) {
+  const ok = await itemExists(item);
+  if (!ok) return false;
+  const databaseItem = await getItemByID(item.getItemID());
+
+  const itemID = item.getItemID() ? item.getItemID() : databaseItem.getItemID();
+  const name = item.getName() ? item.getName() : databaseItem.getName();
+  const sku = item.getSku() ? item.getSku() : databaseItem.getSku();
+  const description = item.getDescription()
+    ? item.getDescription()
+    : databaseItem.getDescription();
+  const category = item.getCategory()
+    ? item.getCategory()
+    : databaseItem.getCategory();
+  const weight = item.getWeight() ? item.getWeight() : databaseItem.getWeight();
+  const costPrice = item.getCostPrice()
+    ? item.getCostPrice()
+    : databaseItem.getCostPrice();
+  const retailPrice = item.getRetailPrice()
+    ? item.getRetailPrice()
+    : databaseItem.getRetailPrice();
+  const supplierID = item.getSupplierID()
+    ? item.getSupplierID()
+    : databaseItem.getSupplierID();
+  const notes = item.getNotes() ? item.getNotes() : databaseItem.getNotes();
+  const caseSize = item.getCaseSize()
+    ? item.getCaseSize()
+    : databaseItem.getCaseSize();
+
+  const conn = new Connectiondb(host, port, user, password, database);
+  const pool = conn.getPool();
+  try {
+    const [result] = await pool.query(
+      `UPDATE item SET  name = ?,
+                        sku = ?,
+                        description = ?,
+                        category = ?,
+                        weight = ?,
+                        costPrice = ?,
+                        retailPrice = ?,
+                        supplierID = ?,
+                        notes = ?,
+                        caseSize = ?
+                  WHERE itemID = ?`,
+      [
+        name,
+        sku,
+        description,
+        category,
+        weight,
+        costPrice,
+        retailPrice,
+        supplierID,
+        notes,
+        caseSize,
+        itemID,
+      ]
+    );
+    return result.affectedRows === 1;
+  } catch (e) {
+    console.error(e);
+    return false;
+  } finally {
+    conn.closePool();
+  }
+}
+
+/**
+ * Checks if an item is active based on their item ID.
+ * @param {Item} item - The item object.
+ * @returns {Promise<boolean>} - Returns true if the item is active, false otherwise.
+ */
+async function isActive(item) {
+  const ok = await itemExists(item);
+  if (!ok) return false;
+
+  const databaseItem = await getItemByID(item.getItemID());
+  return databaseItem.getActive() === 1;
+}
+
+/**
+ * Activates an item by updating their 'active' status to 1 in the database.
+ * @param {Item} item - The item object.
+ * @returns {Promise<boolean>} - Returns true if the item is successfully activated, false otherwise.
+ */
+async function activeItem(item) {
+  const ok = await isActive(item);
+  if (ok) return false;
+
+  const databaseItem = await getItemByID(item.getItemID());
+  const itemID = databaseItem.getItemID();
+
+  const conn = new Connectiondb(host, port, user, password, database);
+  const pool = conn.getPool();
+  try {
+    const [result] = await pool.query(
+      `UPDATE item SET  active = 1
+                  WHERE itemID = ?`,
+      [itemID]
+    );
+    return result.affectedRows === 1;
+  } catch (e) {
+    console.error(e);
+    return false;
+  } finally {
+    conn.closePool();
+  }
+}
+
+/**
+ * Inactive an item by updating their 'active' status to 0 in the database.
+ * @param {Item} item - The item object.
+ * @returns {Promise<boolean>} - Returns true if the item is successfully activated, false otherwise.
+ */
+async function inactiveItem(item) {
+  const ok = await isActive(item);
+  if (!ok) return false;
+
+  const databaseItem = await getItemByID(item.getItemID());
+  const itemID = databaseItem.getItemID();
+
+  const conn = new Connectiondb(host, port, user, password, database);
+  const pool = conn.getPool();
+  try {
+    const [result] = await pool.query(
+      `UPDATE item SET  active = 0
+                  WHERE itemID = ?`,
+      [itemID]
+    );
+    return result.affectedRows === 1;
+  } catch (e) {
+    console.error(e);
+    return false;
+  } finally {
+    conn.closePool();
+  }
+}
+
 // const data = await getAllItems();
-// const data = await getItemByID(10000);
+// const data = await getItemByID(1009);
 const item = new Item(
   1009,
-  "Synthetic Ice",
+  "TEST",
   "60099",
   '24" x 24" piece of synthetic ice',
   "Sports Equipment",
@@ -128,7 +309,16 @@ const item = new Item(
   15.0,
   44.99,
   77777,
-  1
+  0
 );
-const data = await itemExists(item);
-// console.log(data);
+
+const ia = {
+  getAllItems,
+  getItemByID,
+  addItem,
+  updateItem,
+  activeItem,
+  inactiveItem,
+};
+
+export default ia;

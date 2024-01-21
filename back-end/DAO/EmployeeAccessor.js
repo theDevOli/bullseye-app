@@ -257,16 +257,16 @@ async function updateEmployee(employee) {
   const conn = new Connectiondb(host, port, user, password, database);
   const pool = conn.getPool();
 
-  if (
-    !employee.getUsername() &&
-    !employee.getFirstName() &&
-    !employee.getLastName() &&
-    !employee.getEmail() &&
-    !employee.getSiteID() &&
-    !employee.getPositionID() &&
-    !employee.getPassword()
-  )
-    return;
+  // if (
+  //   !employee.getUsername() &&
+  //   !employee.getFirstName() &&
+  //   !employee.getLastName() &&
+  //   !employee.getEmail() &&
+  //   !employee.getSiteID() &&
+  //   !employee.getPositionID() &&
+  //   !employee.getPassword()
+  // )
+  //   return;
   const employeeID = employee.getEmployeeID();
   const databaseEmployee = await getEmployeeByID(employeeID);
 
