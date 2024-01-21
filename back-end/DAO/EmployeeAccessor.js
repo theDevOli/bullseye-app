@@ -50,7 +50,7 @@ async function getAllEmployees() {
 /**
  * Retrieves an employee from the database by id.
  * @param {number} id - employeeID.
- * @returns {Promise<Audit | null>} An Employee object if found, otherwise null.
+ * @returns {Promise<Employee | null>} An Employee object if found, otherwise null.
  */
 async function getEmployeeByID(id) {
   const conn = new Connectiondb(host, port, user, password, database);

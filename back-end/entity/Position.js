@@ -13,7 +13,7 @@ export default class Position {
    * @throws {Error} Throws an error if invalid data types are provided for constructor parameters.
    */
   constructor(positionID, permissionLevel) {
-    if (typeof positionID !== "number" || typeof permissionLevel !== "number") {
+    if (typeof positionID !== "number" || typeof permissionLevel !== "string") {
       throw new Error("Invalid data types for constructor parameters");
     }
 
